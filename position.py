@@ -29,6 +29,12 @@ class Pos:
         
     def get_symbol(id: int) -> str:
         if (id == -1):
+            return " "
+        else:
+            return "o"
+        
+    def get_debug_symbol(id: int) -> str:
+        if (id == -1):
             return "•"
         else:
             return str(id)
