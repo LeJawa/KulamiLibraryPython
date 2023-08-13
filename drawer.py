@@ -23,9 +23,9 @@ class BoardDrawer:
                 left_symbol = self.get_left_symbol(x, y)  
                 
                 if (self.debug):
-                    pos_symbol = Pos.get_debug_symbol(self.board.get_id(x, y))
+                    pos_symbol = Pos.get_debug_symbol(self.board.get_tile_id_at(x, y))
                 else:              
-                    pos_symbol = Pos.get_symbol(self.board.get_id(x, y))
+                    pos_symbol = Pos.get_symbol(self.board.get_tile_id_at(x, y))
                 
                 first_line_str += upper_left_symbol + up_symbol
                 second_line_str += left_symbol + pos_symbol
@@ -51,15 +51,15 @@ class BoardDrawer:
         return str_board
     
     def get_right_symbol(self, x: int, y: int) -> str:
-        left_id = self.board.get_id(x, y)
+        left_id = self.board.get_tile_id_at(x, y)
         if (left_id == -1):
             return " "
         else:
             return "│" 
     
     def get_upper_right_symbol(self, x: int, y: int) -> str:
-        upper_left_id = self.board.get_id(x, y-1)
-        lower_left_id = self.board.get_id(x, y)
+        upper_left_id = self.board.get_tile_id_at(x, y-1)
+        lower_left_id = self.board.get_tile_id_at(x, y)
         
         if (upper_left_id == -1 and lower_left_id == -1):
             return " "
@@ -74,8 +74,8 @@ class BoardDrawer:
             return "┘"
     
     def get_up_symbol(self, x: int, y: int) -> str:
-        up_id = self.board.get_id(x, y-1)
-        down_id = self.board.get_id(x, y)
+        up_id = self.board.get_tile_id_at(x, y-1)
+        down_id = self.board.get_tile_id_at(x, y)
         
         if (up_id == -1 and down_id == -1) or (up_id != -1 and down_id != -1 and up_id == down_id):
             return " "
@@ -83,8 +83,8 @@ class BoardDrawer:
             return "─"
     
     def get_left_symbol(self, x: int, y: int) -> str:
-        left_id = self.board.get_id(x-1, y)
-        right_id = self.board.get_id(x, y)
+        left_id = self.board.get_tile_id_at(x-1, y)
+        right_id = self.board.get_tile_id_at(x, y)
         
         if (left_id == -1 and right_id == -1) or (left_id != -1 and right_id != -1 and left_id == right_id):
             return " "
@@ -92,10 +92,10 @@ class BoardDrawer:
             return "│"    
         
     def get_upper_left_symbol(self, x: int, y: int) -> str:
-        upper_left_id = self.board.get_id(x-1, y-1)
-        upper_right_id = self.board.get_id(x, y-1)
-        lower_left_id = self.board.get_id(x-1, y)
-        lower_right_id = self.board.get_id(x, y)
+        upper_left_id = self.board.get_tile_id_at(x-1, y-1)
+        upper_right_id = self.board.get_tile_id_at(x, y-1)
+        lower_left_id = self.board.get_tile_id_at(x-1, y)
+        lower_right_id = self.board.get_tile_id_at(x, y)
         
         # All empty
         if (upper_left_id == -1 and upper_right_id == -1 and lower_left_id == -1 and lower_right_id == -1):
