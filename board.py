@@ -11,56 +11,19 @@
 #  - If a tile cannot be placed, try the next tile
 
 from math import cos
-from random import uniform
+from random import shuffle, uniform, choice
 import random
+from bitmasking import check_collision
+from constants import BOARD_SIZE
 
 random_multiplier = 0.001
-# random.seed(0)
+random.seed(6)
 
 from drawer import BoardDrawer
 from position import Pos
-from tile import Tile, TileMaker
-
-def bin(num: int) -> str:
-    bin_length = board_size**2 + 2
-    return format(num, f'#0{bin_length}b')
-
-def collides(tile: int, board_mask: int) -> bool:
-    # Or operation sets all bits that are set in either the tile or the board_mask
-    # Minus operation removes the tile bits from the board_mask
-    # If there is no collision, we should get the board_mask back
-    # otherwise, there is a collision
-    return (board_mask | tile) - tile != board_mask
+from tile import QuantumTile, QuantumTileMaker, Tile
 
 
-CRED = '\033[91m'
-CGREEN  = '\33[32m'
-CEND = '\033[0m'
-
-def check_collision(board: 'Board', tile: Tile, rotated: bool = False) -> bool:
-    board_mask = board.get_board_bit_mask()
-    tile_mask = tile.get_bit_mask(rotated)
-
-    tile_mask_str = bin(tile_mask)
-    colored_tile_mask_str = ""
-    for i in range(len(tile_mask_str)):
-        if (tile_mask_str[i] == "1"):
-            if (tile_mask_str[i] == bin(board_mask)[i]):
-                colored_tile_mask_str += CRED + tile_mask_str[i] + CEND
-            else:
-                colored_tile_mask_str += CGREEN + tile_mask_str[i] + CEND
-        else:
-            colored_tile_mask_str += tile_mask_str[i]
-    
-    
-    print(colored_tile_mask_str)
-    print(bin(board_mask))
-
-    print("Collision" if collides(tile_mask, board_mask) else "No collision")
-
-    print(board)
-    
-    return collides(tile_mask, board_mask)
     
 class Board:
     def __init__(self, size: int) -> None: 
@@ -69,6 +32,8 @@ class Board:
         
         self.positions: list[Pos] = []       
         self.generate_positions()
+        
+        self.tiles: list[Tile] = []
 
     def generate_positions(self):
         self.positions.clear()
@@ -85,6 +50,9 @@ class Board:
         drawer = BoardDrawer(self)
         drawer.debug = True        
         return str(drawer)
+    
+    def draw(self) -> None:
+        print(self)
     
    
     def get_id(self, x: int, y: int) -> int:
@@ -105,11 +73,10 @@ class Board:
         return mask
     
     def calculate_weight(self, position: Pos) -> float:
-        # uniform(-1,1)*random_multiplier is used to add a small random value to the weight
-        pos_delta = Pos(uniform(-1,1)*random_multiplier, uniform(-1,1)*random_multiplier)
-        position += pos_delta
+        random_pos_delta = Pos(uniform(-1,1)*random_multiplier, uniform(-1,1)*random_multiplier)
+        jittered_position = position + random_pos_delta
         
-        return position.distance_from(self.center)
+        return jittered_position.distance_from(self.center)
     
     def fill(self) -> None:
         for pos in self.positions:
@@ -117,17 +84,44 @@ class Board:
             chance = cos(distance / ((self.size-1)/2) * 3.14/2)
             
             if (uniform(0,1) < chance):
-                pos.set_tile_id(1)
+                pos.set_tile_id(choice([1,1,2]))
+    
+    def can_place_tile(self, tile: Tile) -> bool:
+        board_mask = self.get_board_bit_mask()
+        tile_mask = tile.get_bit_mask(BOARD_SIZE)
+        return (board_mask | tile_mask) - tile_mask == board_mask
+    
+    def place_qtile(self, qtile: QuantumTile, position: Pos) -> bool:
+        possible_tiles = qtile.get_possible_tiles_at(position)
+        
+        shuffle(possible_tiles)
+        
+        for tile in possible_tiles:
+            if (self.can_place_tile(tile)):
+                self.tiles.append(tile)
+                return True
+            
+        return False
+        
+        
             
         
 
-board_size = 7
-board = Board(board_size)
+board = Board(BOARD_SIZE)
 board.generate_positions()
 board.fill()
 
-tile = TileMaker.get2x1()
-tile.move_to(Pos(2,2))
+qtile = QuantumTileMaker.get2x1()
+qtile2 = QuantumTileMaker.get2x2()
+
+tile = qtile.collapse_at(Pos(0,1))
+
+print(board.place_qtile(qtile, Pos(0,1)))
+print(board.place_qtile(qtile2, Pos(3,3)))
 
 
-check_collision(board, tile, True)
+check_collision(tile.get_bit_mask(BOARD_SIZE), board.get_board_bit_mask(), BOARD_SIZE**2)
+
+print(board.tiles)
+
+print(board)
