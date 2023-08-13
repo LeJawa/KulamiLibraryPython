@@ -1,10 +1,5 @@
+from cmath import sqrt
 from dataclasses import dataclass
-from math import sqrt
-from random import uniform, choice
-import random
-
-random_multiplier = 0.001
-random.seed(0)
 
 @dataclass
 class Pos:
@@ -16,12 +11,6 @@ class Pos:
         self.x = x
         self.y = y
         self.id: int = -1
-        
-        self.id = choice([-1,1,2,-1,-1,1,2,3,1,-1])
-        
-
-    def calculate_weight(self) -> float:
-        return sqrt((self.x + uniform(-1,1)*random_multiplier)**2 + (self.y + uniform(-1,1)*random_multiplier)**2)
     
     def is_empty(self) -> bool:
         return self.id == -1
@@ -40,4 +29,19 @@ class Pos:
             return "•"
         else:
             return str(id)
+        
+    def __add__(self, other: 'Pos'):
+        return Pos(self.x + other.x, self.y + other.y)
+    
+    def distance_from(self, other: 'Pos') -> float:
+        return sqrt((self.x - other.x)**2 + (self.y - other.y)**2).real
+    
+    def magnitude(self) -> float:
+        return sqrt(self.x**2 + self.y**2)
+    
+    def __lt__(self, other: 'Pos') -> bool:
+        return self.magnitude() < other.magnitude()
+    
+    def __gt__(self, other: 'Pos') -> bool:
+        return self.magnitude() > other.magnitude()
                    

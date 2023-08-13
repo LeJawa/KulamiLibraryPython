@@ -10,8 +10,16 @@
 #  - If a tile can be placed, place it and remove the position from the list
 #  - If a tile cannot be placed, try the next tile
 
+from math import cos
+from random import uniform
+import random
+
+random_multiplier = 0.001
+# random.seed(0)
+
 from drawer import BoardDrawer
 from position import Pos
+from tile import Tile, TileMaker
 
 def bin(num: int) -> str:
     bin_length = board_size**2 + 2
@@ -23,10 +31,42 @@ def collides(tile: int, board_mask: int) -> bool:
     # If there is no collision, we should get the board_mask back
     # otherwise, there is a collision
     return (board_mask | tile) - tile != board_mask
+
+
+CRED = '\033[91m'
+CGREEN  = '\33[32m'
+CEND = '\033[0m'
+
+def check_collision(board: 'Board', tile: Tile, rotated: bool = False) -> bool:
+    board_mask = board.get_board_bit_mask()
+    tile_mask = tile.get_bit_mask(rotated)
+
+    tile_mask_str = bin(tile_mask)
+    colored_tile_mask_str = ""
+    for i in range(len(tile_mask_str)):
+        if (tile_mask_str[i] == "1"):
+            if (tile_mask_str[i] == bin(board_mask)[i]):
+                colored_tile_mask_str += CRED + tile_mask_str[i] + CEND
+            else:
+                colored_tile_mask_str += CGREEN + tile_mask_str[i] + CEND
+        else:
+            colored_tile_mask_str += tile_mask_str[i]
+    
+    
+    print(colored_tile_mask_str)
+    print(bin(board_mask))
+
+    print("Collision" if collides(tile_mask, board_mask) else "No collision")
+
+    print(board)
+    
+    return collides(tile_mask, board_mask)
     
 class Board:
     def __init__(self, size: int) -> None: 
         self.size: int = size
+        self.center = Pos(size//2, size//2)
+        
         self.positions: list[Pos] = []       
         self.generate_positions()
 
@@ -38,7 +78,7 @@ class Board:
 
     def get_sorted_positions(self) -> list[Pos]:
         sorted_positions = self.positions.copy()
-        sorted_positions.sort(key=lambda pos: pos.calculate_weight())
+        sorted_positions.sort(key=lambda position: self.calculate_weight(position))
         return sorted_positions
         
     def __str__(self) -> str:
@@ -63,22 +103,31 @@ class Board:
             bit_position = pos.x * self.size + pos.y
             mask |= 1 << bit_position
         return mask
+    
+    def calculate_weight(self, position: Pos) -> float:
+        # uniform(-1,1)*random_multiplier is used to add a small random value to the weight
+        pos_delta = Pos(uniform(-1,1)*random_multiplier, uniform(-1,1)*random_multiplier)
+        position += pos_delta
+        
+        return position.distance_from(self.center)
+    
+    def fill(self) -> None:
+        for pos in self.positions:
+            distance = pos.distance_from(self.center)
+            chance = cos(distance / ((self.size-1)/2) * 3.14/2)
+            
+            if (uniform(0,1) < chance):
+                pos.set_tile_id(1)
+            
+        
 
-board_size = 3
+board_size = 7
 board = Board(board_size)
 board.generate_positions()
+board.fill()
+
+tile = TileMaker.get2x1()
+tile.move_to(Pos(2,2))
 
 
-tile_no_collision = 0b100100000
-tile_collision = 0b110000000
-board_mask = board.get_board_bit_mask()
-
-tile = tile_no_collision
-
-
-print(bin(tile))
-print(bin(board_mask))
-
-print("Collision" if collides(tile, board_mask) else "No collision")
-
-print(board)
+check_collision(board, tile, True)
