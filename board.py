@@ -13,10 +13,10 @@
 from random import shuffle, uniform
 import random
 from bitmasking import check_collision
-from constants import BOARD_SIZE
+from constants import BOARD_AVAILABLE_SIZE, MAX_BOARD_SIZE
 
 random_multiplier = 0.001
-random.seed(6)
+# random.seed(6)
 
 from drawer import BoardDrawer
 from position import Pos
@@ -26,15 +26,16 @@ from tile import QuantumTile, QuantumTileMaker, Tile
     
 class Board:
     def __init__(self, size: int) -> None: 
-        self.size: int = size
+        self.available_size: int = size
         self.center = Pos(size//2, size//2)
+        self.max_board_size = MAX_BOARD_SIZE
         
         self.tiles: list[Tile] = []
 
     def get_sorted_positions(self) -> list[Pos]:
         sorted_positions = []
-        for x in range(self.size):
-            for y in range(self.size):
+        for x in range(self.available_size):
+            for y in range(self.available_size):
                 sorted_positions.append(Pos(x, y))
         sorted_positions.sort(key=lambda position: self.calculate_weight(position))
         return sorted_positions
@@ -49,7 +50,7 @@ class Board:
     
    
     def get_tile_id_at(self, x: int, y: int) -> int:
-        if (x < 0 or x >= self.size or y < 0 or y >= self.size):
+        if (x < 0 or x >= self.available_size or y < 0 or y >= self.available_size):
             return -1 # Out of bounds    
         
         for tile in self.tiles:
@@ -65,7 +66,7 @@ class Board:
         for tile in self.tiles:
             for pos in tile.positions:
                 # Set the bit to one at the specified position
-                bit_position = pos.x * self.size + pos.y
+                bit_position = pos.x * self.available_size + pos.y
                 mask |= 1 << bit_position
         return mask
     
@@ -75,10 +76,44 @@ class Board:
         
         return jittered_position.distance_from(self.center)
     
-    def can_place_tile(self, tile: Tile) -> bool:
+    def tile_collides_with_board(self, tile: Tile) -> bool:
         board_mask = self.get_board_bit_mask()
-        tile_mask = tile.get_bit_mask(BOARD_SIZE)
-        return (board_mask | tile_mask) - tile_mask == board_mask
+        tile_mask = tile.get_bit_mask(self.available_size)
+        return (board_mask | tile_mask) - tile_mask != board_mask
+    
+    def max_board_size_reached(self, tile: Tile) -> bool:
+        min_x = self.available_size
+        max_x = 0
+        min_y = self.available_size
+        max_y = 0
+        
+        for pos in tile.positions:
+            min_x = min(min_x, pos.x)
+            max_x = max(max_x, pos.x)
+            min_y = min(min_y, pos.y)
+            max_y = max(max_y, pos.y)
+        
+        for tile in self.tiles:
+            for pos in tile.positions:
+                min_x = min(min_x, pos.x)
+                max_x = max(max_x, pos.x)
+                min_y = min(min_y, pos.y)
+                max_y = max(max_y, pos.y)
+        
+        if (max_x - min_x >= self.max_board_size or max_y - min_y >= self.max_board_size):
+            return True
+        else:
+            return False
+        
+    
+    def can_place_tile(self, tile: Tile) -> bool:
+        if (self.tile_collides_with_board(tile)):
+            return False
+        
+        if (self.max_board_size_reached(tile)):
+            return False    
+
+        return True
     
     def place_qtile(self, qtile: QuantumTile, position: Pos) -> bool:
         possible_tiles = qtile.get_possible_tiles_at(position)
@@ -111,7 +146,7 @@ class Board:
             
         
 
-board = Board(BOARD_SIZE)
+board = Board(BOARD_AVAILABLE_SIZE)
 
 bag_of_qtiles = []
 

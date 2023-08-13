@@ -4,7 +4,7 @@ from position import Pos
 class BoardDrawer:
     def __init__(self, board) -> None:
         self.board = board       
-        self.size = board.size 
+        self.size = board.available_size 
         
         self.debug = False
     
