@@ -56,18 +56,30 @@ class QuantumTile:
         tile_list: list[Tile] = []
         for raw_position in self.raw_positions:
             tile_positions = []
+            out_of_bounds = False
             for pos in self.positions:
                 possible_position = pos - raw_position
+                if possible_position.is_negative():
+                    out_of_bounds = True
+                    continue
+                
                 tile_positions.append(possible_position)
-            tile_list.append(Tile(tile_positions, self.id))
+            if not out_of_bounds:
+                tile_list.append(Tile(tile_positions, self.id))
         
         if self.has_rotation:
             for rotated_raw_position in self.rotated_raw_positions:
                 tile_positions = []
+                out_of_bounds = False
                 for pos in self.rotated_positions:
                     possible_position = pos - rotated_raw_position
+                    if possible_position.is_negative():
+                        out_of_bounds = True
+                        continue
+                    
                     tile_positions.append(possible_position)
-                tile_list.append(Tile(tile_positions, self.id))
+                if not out_of_bounds:
+                    tile_list.append(Tile(tile_positions, self.id))
             
         return tile_list
     

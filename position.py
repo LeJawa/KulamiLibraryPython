@@ -47,4 +47,7 @@ class Pos:
     
     def __gt__(self, other: 'Pos') -> bool:
         return self.magnitude() > other.magnitude()
+    
+    def is_negative(self) -> bool:
+        return self.x < 0 or self.y < 0
                    
