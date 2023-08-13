@@ -22,7 +22,8 @@ class Tile:
         return self.__str__()
 
 class QuantumTile:
-    next_id = -1
+    possible_ids = [*'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`~!@#$%^&*()-_=+[{]}|;:\'",<.>/?']
+    next_id_index = -1
     
     def __init__(self, raw_positions: list[Pos], rotated_raw_positions: list[Pos] = []) -> None:
         self.raw_positions = raw_positions
@@ -38,8 +39,8 @@ class QuantumTile:
         self.rotated_positions = self.rotated_raw_positions.copy()
         
     def assign_id() -> int:
-        QuantumTile.next_id += 1
-        return QuantumTile.next_id
+        QuantumTile.next_id_index += 1
+        return QuantumTile.possible_ids[QuantumTile.next_id_index]
     
     def move_to(self, position: Pos) -> None:
         self.positions.clear()

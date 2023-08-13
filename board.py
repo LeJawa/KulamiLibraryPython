@@ -41,7 +41,7 @@ class Board:
         
     def __str__(self) -> str:
         drawer = BoardDrawer(self)
-        drawer.debug = True        
+        drawer.debug = False        
         return str(drawer)
     
     def draw(self) -> None:
@@ -91,6 +91,21 @@ class Board:
                 return True
             
         return False
+    
+    def place_all_qtiles(self, bag_of_qtiles: list[QuantumTile]) -> bool:
+        positions = self.get_sorted_positions()
+        
+        shuffle(bag_of_qtiles)
+        for position in positions:
+            for qtile in bag_of_qtiles:
+                if (self.place_qtile(qtile, position)):
+                    bag_of_qtiles.remove(qtile)
+                    break
+            
+            if (len(bag_of_qtiles) == 0):
+                return True
+        
+        return False
         
      
             
@@ -98,17 +113,15 @@ class Board:
 
 board = Board(BOARD_SIZE)
 
-qtile = QuantumTileMaker.get2x1()
-qtile2 = QuantumTileMaker.get2x2()
+bag_of_qtiles = []
 
-tile = qtile.collapse_at(Pos(0,1))
+for _ in range(4):
+    bag_of_qtiles.append(QuantumTileMaker.get2x1())
+    bag_of_qtiles.append(QuantumTileMaker.get2x2())
+    bag_of_qtiles.append(QuantumTileMaker.get3x1())
+    bag_of_qtiles.append(QuantumTileMaker.get3x2())
+bag_of_qtiles.append(QuantumTileMaker.get2x2())
 
-print(board.place_qtile(qtile, Pos(0,1)))
-print(board.place_qtile(qtile2, Pos(3,3)))
+board.place_all_qtiles(bag_of_qtiles)
 
-
-check_collision(tile.get_bit_mask(BOARD_SIZE), board.get_board_bit_mask(), BOARD_SIZE**2)
-
-print(board.tiles)
-
-print(board)
+board.draw()
