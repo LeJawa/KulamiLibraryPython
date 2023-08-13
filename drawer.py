@@ -1,4 +1,5 @@
 # from board import Board
+from bash_color import Color, color
 from position import Pos, State
 
 
@@ -18,9 +19,9 @@ class BoardDrawer:
         if (state == State.EMPTY):
             return " "
         elif (state == State.PLAYER1):
-            return "₁"
+            return color("⁕", Color.RED)
         elif (state == State.PLAYER2):
-            return "₂"
+            return color("⁕", Color.BLUE)
         elif (state == State.EMPTY_TILE):
             return "o"
         else:
@@ -49,14 +50,14 @@ class BoardDrawer:
                 else:              
                     pos_symbol = BoardDrawer.get_symbol(self.board.get_pos_at(x, y))
                 
-                first_line_str += upper_left_symbol + up_symbol
-                second_line_str += left_symbol + pos_symbol
+                first_line_str += color(upper_left_symbol + up_symbol, Color.DARKGREY)
+                second_line_str += color(left_symbol, Color.DARKGREY) + pos_symbol
             
             upper_right_symbol = self.get_upper_right_symbol(x, y)
             right_symbol = self.get_right_symbol(x, y)
             
-            first_line_str += upper_right_symbol + "\n"
-            second_line_str += right_symbol + "\n"
+            first_line_str += color(upper_right_symbol, Color.DARKGREY) + "\n"
+            second_line_str += color(right_symbol, Color.DARKGREY) + "\n" 
                 
             str_board += first_line_str + second_line_str
         
@@ -68,7 +69,7 @@ class BoardDrawer:
         upper_right_symbol = self.get_upper_right_symbol(x, y+1)
         last_line_str += upper_right_symbol + "\n"
         
-        str_board += last_line_str
+        str_board += color(last_line_str, Color.DARKGREY)
         
         return str_board
     

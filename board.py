@@ -17,7 +17,7 @@ random_multiplier = 0.001
 seed()
 
 from drawer import BoardDrawer
-from position import Pos
+from position import Pos, State
 from tile import QuantumTile, QuantumTileMaker, Tile
 
 
@@ -173,5 +173,8 @@ for _ in range(4):
 bag_of_qtiles.append(QuantumTileMaker.get2x2())
 
 board.place_all_qtiles(bag_of_qtiles)
+
+board.occupied_positions[4].state = State.PLAYER1
+board.occupied_positions[10].state = State.PLAYER2
 
 board.draw()

@@ -1,10 +1,9 @@
+from bash_color import Color, color
+
+
 def formatted_bin(num: int, mask_size) -> str:
     bin_length = mask_size + 2
     return format(num, f'#0{bin_length}b')
-
-CRED = '\033[91m'
-CGREEN  = '\33[32m'
-CEND = '\033[0m'
 
 def check_collision(shape_mask: int, target_mask: int, forced_mask_size = 0) -> bool:
     if (forced_mask_size != 0):
@@ -17,9 +16,9 @@ def check_collision(shape_mask: int, target_mask: int, forced_mask_size = 0) -> 
     for i in range(len(tile_mask_str)):
         if (tile_mask_str[i] == "1"):
             if (tile_mask_str[i] == formatted_bin(target_mask, mask_size)[i]):
-                colored_tile_mask_str += CRED + tile_mask_str[i] + CEND
+                colored_tile_mask_str += color(tile_mask_str[i], Color.RED)
             else:
-                colored_tile_mask_str += CGREEN + tile_mask_str[i] + CEND
+                colored_tile_mask_str += color(tile_mask_str[i], Color.GREEN)
         else:
             colored_tile_mask_str += tile_mask_str[i]
     
