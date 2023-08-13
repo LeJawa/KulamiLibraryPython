@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 from random import choice
 from position import Pos
 
-class Tile:    
-    def __init__(self, positions: list[Pos], id: int) -> None:
-        self.positions = positions
-        self.id = id        
+@dataclass
+class Tile:
+    positions: list[Pos]
+    id: int     
     
     def get_bit_mask(self, mask_size) -> int:
         mask = 0
@@ -21,7 +22,6 @@ class Tile:
         return self.__str__()
 
 class QuantumTile:
-    mask_size = 3
     next_id = -1
     
     def __init__(self, raw_positions: list[Pos], rotated_raw_positions: list[Pos] = []) -> None:
