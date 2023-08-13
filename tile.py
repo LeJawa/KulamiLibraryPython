@@ -1,15 +1,33 @@
-from math import cos, radians, sin
+from random import choice
 from position import Pos
 
+class Tile:    
+    def __init__(self, positions: list[Pos], id: int) -> None:
+        self.positions = positions
+        self.id = id        
+    
+    def get_bit_mask(self, mask_size) -> int:
+        mask = 0
+        for pos in self.positions:
+            # Set the bit to one at the specified position
+            bit_position = pos.x * mask_size + pos.y
+            mask |= 1 << bit_position
+        return mask
+    
+    def __str__(self) -> str:
+        return f"Tile {self.id} at {self.positions}"
+    
+    def __repr__(self) -> str:
+        return self.__str__()
 
-class Tile:
+class QuantumTile:
     mask_size = 3
     next_id = -1
     
     def __init__(self, raw_positions: list[Pos], rotated_raw_positions: list[Pos] = []) -> None:
         self.raw_positions = raw_positions
         self.rotated_raw_positions = rotated_raw_positions
-        self.id = Tile.assign_id()
+        self.id = QuantumTile.assign_id()
         self.has_rotation = False
         
         if (len(rotated_raw_positions) > 0):
@@ -20,23 +38,8 @@ class Tile:
         self.rotated_positions = self.rotated_raw_positions.copy()
         
     def assign_id() -> int:
-        Tile.next_id += 1
-        return Tile.next_id
-    
-    @staticmethod
-    def bit_mask(positions) -> int:
-        mask = 0
-        for pos in positions:
-            # Set the bit to one at the specified position
-            bit_position = pos.x * Tile.mask_size + pos.y
-            mask |= 1 << bit_position
-        return mask
-    
-    def get_bit_mask(self, rotated = False) -> int:
-        if rotated and self.has_rotation:
-            return self.bit_mask(self.rotated_positions)
-        
-        return self.bit_mask(self.positions)
+        QuantumTile.next_id += 1
+        return QuantumTile.next_id
     
     def move_to(self, position: Pos) -> None:
         self.positions.clear()
@@ -46,15 +49,53 @@ class Tile:
         self.rotated_positions.clear()
         for pos in self.rotated_raw_positions:
             self.rotated_positions.append(pos + position)
+            
+    def get_possible_tiles_at(self, position: Pos) -> list[Tile]:
+        self.move_to(position)
         
+        tile_list: list[Tile] = []
+        for raw_position in self.raw_positions:
+            tile_positions = []
+            for pos in self.positions:
+                possible_position = pos - raw_position
+                tile_positions.append(possible_position)
+            tile_list.append(Tile(tile_positions, self.id))
         
+        if self.has_rotation:
+            for rotated_raw_position in self.rotated_raw_positions:
+                tile_positions = []
+                for pos in self.rotated_positions:
+                    possible_position = pos - rotated_raw_position
+                    tile_positions.append(possible_position)
+                tile_list.append(Tile(tile_positions, self.id))
+            
+        return tile_list
+    
+    def collapse(self) -> Tile:
+        return self.collapse_at(Pos(0,0))
+    
+    def collapse_at(self, position: Pos) -> Tile:
+        return choice(self.get_possible_tiles_at(position))
+
     
 
-class TileMaker:
-    def get1x1() -> Tile:
-        tile = Tile([Pos(0,0)])
+class QuantumTileMaker:
+    def get1x1() -> QuantumTile:
+        tile = QuantumTile([Pos(0,0)])
         return tile
     
-    def get2x1() -> Tile:
-        tile = Tile([Pos(0,0), Pos(1,0)], [Pos(0,0), Pos(0,1)])
+    def get2x1() -> QuantumTile:
+        tile = QuantumTile([Pos(0,0), Pos(1,0)], [Pos(0,0), Pos(0,1)])
+        return tile
+    
+    def get3x1() -> QuantumTile:
+        tile = QuantumTile([Pos(0,0), Pos(1,0), Pos(2,0)], [Pos(0,0), Pos(0,1), Pos(0,2)])
+        return tile
+    
+    def get2x2() -> QuantumTile:
+        tile = QuantumTile([Pos(0,0), Pos(1,0), Pos(0,1), Pos(1,1)])
+        return tile
+    
+    def get3x2() -> QuantumTile:
+        tile = QuantumTile([Pos(0,0), Pos(1,0), Pos(2,0), Pos(0,1), Pos(1,1), Pos(2,1)], [Pos(0,0), Pos(0,1), Pos(0,2), Pos(1,0), Pos(1,1), Pos(1,2)])
         return tile
