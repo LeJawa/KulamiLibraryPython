@@ -207,6 +207,8 @@ class BoardDrawer:
                 return "┼"            
             elif (upper_left_id == upper_right_id and upper_left_id == lower_left_id and upper_left_id == lower_right_id):
                 return " "
+            elif (upper_left_id != upper_right_id and upper_left_id != lower_left_id and upper_left_id != lower_right_id and upper_right_id != lower_left_id and upper_right_id != lower_right_id and lower_left_id != lower_right_id):
+                return "┼"
         
         print("Error: get_upper_left_symbol")
         print("upper_left_id: " + str(upper_left_id))
