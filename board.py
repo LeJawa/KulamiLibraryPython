@@ -10,13 +10,11 @@
 #  - If a tile can be placed, place it and remove the position from the list
 #  - If a tile cannot be placed, try the next tile
 
-from random import shuffle, uniform
-import random
-from bitmasking import check_collision
+from random import shuffle, uniform, seed
 from constants import BOARD_AVAILABLE_SIZE, MAX_BOARD_SIZE
 
 random_multiplier = 0.001
-# random.seed(6)
+seed()
 
 from drawer import BoardDrawer
 from position import Pos
@@ -31,6 +29,8 @@ class Board:
         self.max_board_size = MAX_BOARD_SIZE
         
         self.tiles: list[Tile] = []
+        
+        self.occupied_positions: list[Pos] = []
 
     def get_sorted_positions(self) -> list[Pos]:
         sorted_positions = []
@@ -42,11 +42,19 @@ class Board:
         
     def __str__(self) -> str:
         drawer = BoardDrawer(self)
-        drawer.debug = False        
+        drawer.debug = False    
         return str(drawer)
     
     def draw(self) -> None:
         print(self)
+        
+    def get_pos_at(self, x: int, y: int) -> Pos:
+        for tile in self.tiles:
+            for pos in tile.positions:
+                if (pos.x == x and pos.y == y):
+                    return pos
+        
+        return Pos(x, y)
     
    
     def get_tile_id_at(self, x: int, y: int) -> int:
@@ -127,6 +135,12 @@ class Board:
             
         return False
     
+    def initialize_occupied_positions(self) -> None:
+        self.occupied_positions.clear()
+        for tile in self.tiles:
+            for pos in tile.positions:
+                self.occupied_positions.append(pos)
+    
     def place_all_qtiles(self, bag_of_qtiles: list[QuantumTile]) -> bool:
         positions = self.get_sorted_positions()
         
@@ -138,6 +152,7 @@ class Board:
                     break
             
             if (len(bag_of_qtiles) == 0):
+                self.initialize_occupied_positions()
                 return True
         
         return False

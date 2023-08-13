@@ -1,4 +1,5 @@
-from position import Pos
+# from board import Board
+from position import Pos, State
 
 
 class BoardDrawer:
@@ -11,6 +12,27 @@ class BoardDrawer:
     def __repr__(self) -> str:
         return self.__str__()
     
+    @staticmethod
+    def get_symbol(pos: Pos) -> str:
+        state = pos.state
+        if (state == State.EMPTY):
+            return " "
+        elif (state == State.PLAYER1):
+            return "₁"
+        elif (state == State.PLAYER2):
+            return "₂"
+        elif (state == State.EMPTY_TILE):
+            return "o"
+        else:
+            return "?"
+    
+    @staticmethod
+    def get_debug_symbol(pos: Pos) -> str:
+        if (pos.state == State.EMPTY):
+            return "•"
+        else:
+            return str(pos.tile_id)
+    
     def __str__(self) -> str:
         str_board = ""   
     
@@ -20,12 +42,12 @@ class BoardDrawer:
             for x in range(self.size):
                 upper_left_symbol = self.get_upper_left_symbol(x, y)
                 up_symbol = self.get_up_symbol(x, y)
-                left_symbol = self.get_left_symbol(x, y)  
+                left_symbol = self.get_left_symbol(x, y)
                 
                 if (self.debug):
-                    pos_symbol = Pos.get_debug_symbol(self.board.get_tile_id_at(x, y))
+                    pos_symbol = BoardDrawer.get_debug_symbol(self.board.get_pos_at(x, y))
                 else:              
-                    pos_symbol = Pos.get_symbol(self.board.get_tile_id_at(x, y))
+                    pos_symbol = BoardDrawer.get_symbol(self.board.get_pos_at(x, y))
                 
                 first_line_str += upper_left_symbol + up_symbol
                 second_line_str += left_symbol + pos_symbol

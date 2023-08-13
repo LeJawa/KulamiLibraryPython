@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import choice
-from position import Pos
+from position import Pos, State
 
 @dataclass
 class Tile:
@@ -64,6 +64,8 @@ class QuantumTile:
                     out_of_bounds = True
                     continue
                 
+                possible_position.set_tile_id(self.id)
+                possible_position.state = State.EMPTY_TILE
                 tile_positions.append(possible_position)
             if not out_of_bounds:
                 tile_list.append(Tile(tile_positions, self.id))
@@ -77,6 +79,9 @@ class QuantumTile:
                     if possible_position.is_negative():
                         out_of_bounds = True
                         continue
+                
+                    possible_position.set_tile_id(self.id)
+                    possible_position.state = State.EMPTY_TILE
                     
                     tile_positions.append(possible_position)
                 if not out_of_bounds:

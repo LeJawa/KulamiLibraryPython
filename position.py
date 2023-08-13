@@ -1,34 +1,31 @@
 from cmath import sqrt
 from dataclasses import dataclass
 
+class State:
+    EMPTY = 0
+    EMPTY_TILE = 1
+    PLAYER1 = 2
+    PLAYER2 = 3
+
+
 @dataclass
 class Pos:
     x: int
     y: int
+    tile_id: int
     
     
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
-        self.id: int = -1
+        self.state: State = State.EMPTY
+        self.tile_id = -1
     
     def is_empty(self) -> bool:
-        return self.id == -1
+        return self.state == State.EMPTY_TILE or self.state == State.EMPTY
     
     def set_tile_id(self, id: int) -> None:
-        self.id = id
-        
-    def get_symbol(id: int) -> str:
-        if (id == -1):
-            return " "
-        else:
-            return "o"
-        
-    def get_debug_symbol(id: int) -> str:
-        if (id == -1):
-            return "•"
-        else:
-            return str(id)
+        self.tile_id = id
         
     def __add__(self, other: 'Pos'):
         return Pos(self.x + other.x, self.y + other.y)
