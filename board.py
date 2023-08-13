@@ -12,6 +12,17 @@
 
 from drawer import BoardDrawer
 from position import Pos
+
+def bin(num: int) -> str:
+    bin_length = (board_size * 2 + 1)**2 + 2
+    return format(num, f'#0{bin_length}b')
+
+def collides(tile: int, board_mask: int) -> bool:
+    # Or operation sets all bits that are set in either the tile or the board_mask
+    # Minus operation removes the tile bits from the board_mask
+    # If there is no collision, we should get the board_mask back
+    # otherwise, there is a collision
+    return (board_mask | tile) - tile != board_mask
     
 class Board:
     def __init__(self, size: int) -> None: 
@@ -42,9 +53,32 @@ class Board:
         
         board_size = int(self.size * 2 + 1)
         return self.positions[ (x+self.size)*board_size + (y + self.size) ].id
+    
+    def get_board_bit_mask(self) -> int:
+        mask = 0
+        for pos in self.positions:
+            if (pos.is_empty()):
+                continue
+            # Set the bit to one at the specified position
+            bit_position = (pos.x + self.size) * (self.size * 2 + 1) + (pos.y + self.size)
+            mask |= 1 << bit_position
+        return mask
 
-board = Board(15)
+board_size = 1
+board = Board(board_size)
 board.generate_positions()
 
+
+tile_no_collision = 0b100100000
+tile_collision = 0b110000000
+board_mask = board.get_board_bit_mask()
+
+tile = tile_no_collision
+
+
+print(bin(tile))
+print(bin(board_mask))
+
+print("Collision" if collides(tile, board_mask) else "No collision")
 
 print(board)

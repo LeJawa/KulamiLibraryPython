@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from math import sqrt
 from random import uniform, choice
+import random
 
 random_multiplier = 0.001
+random.seed(0)
 
 @dataclass
 class Pos:
