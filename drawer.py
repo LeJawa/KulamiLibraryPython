@@ -64,7 +64,10 @@ class BoardDrawer:
         if (upper_left_id == -1 and lower_left_id == -1):
             return " "
         elif (upper_left_id != -1 and lower_left_id != -1):
-            return "│"
+            if (upper_left_id == lower_left_id):
+                return "│"
+            else:
+                return "┤"
         elif (upper_left_id == -1 and lower_left_id != -1):
             return "┐"
         else:
