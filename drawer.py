@@ -14,10 +14,10 @@ class BoardDrawer:
     def __str__(self) -> str:
         str_board = ""   
     
-        for y in range(-self.size, self.size+1):
+        for y in range(self.size):
             first_line_str = ""
             second_line_str = ""
-            for x in range(-self.size, self.size+1):
+            for x in range(self.size):
                 upper_left_symbol = self.get_upper_left_symbol(x, y)
                 up_symbol = self.get_up_symbol(x, y)
                 left_symbol = self.get_left_symbol(x, y)  
@@ -39,7 +39,7 @@ class BoardDrawer:
             str_board += first_line_str + second_line_str
         
         last_line_str = ""
-        for x in range(-self.size, self.size+1):
+        for x in range(self.size):
             upper_left_symbol = self.get_upper_left_symbol(x, y+1)
             up_symbol = self.get_up_symbol(x, y+1)
             last_line_str += upper_left_symbol + up_symbol

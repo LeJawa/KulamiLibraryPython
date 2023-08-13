@@ -14,7 +14,7 @@ from drawer import BoardDrawer
 from position import Pos
 
 def bin(num: int) -> str:
-    bin_length = (board_size * 2 + 1)**2 + 2
+    bin_length = board_size**2 + 2
     return format(num, f'#0{bin_length}b')
 
 def collides(tile: int, board_mask: int) -> bool:
@@ -32,8 +32,8 @@ class Board:
 
     def generate_positions(self):
         self.positions.clear()
-        for x in range(-self.size, self.size+1):
-            for y in range(-self.size, self.size+1):
+        for x in range(self.size):
+            for y in range(self.size):
                 self.positions.append(Pos(x, y))
 
     def get_sorted_positions(self) -> list[Pos]:
@@ -43,16 +43,16 @@ class Board:
         
     def __str__(self) -> str:
         drawer = BoardDrawer(self)
-        drawer.debug = False        
+        drawer.debug = True        
         return str(drawer)
     
    
     def get_id(self, x: int, y: int) -> int:
-        if (x < -self.size or x > self.size or y < -self.size or y > self.size):
+        if (x < 0 or x >= self.size or y < 0 or y >= self.size):
             return -1        
         
-        board_size = int(self.size * 2 + 1)
-        return self.positions[ (x+self.size)*board_size + (y + self.size) ].id
+        board_size = self.size
+        return self.positions[ x*board_size + y ].id
     
     def get_board_bit_mask(self) -> int:
         mask = 0
@@ -60,11 +60,11 @@ class Board:
             if (pos.is_empty()):
                 continue
             # Set the bit to one at the specified position
-            bit_position = (pos.x + self.size) * (self.size * 2 + 1) + (pos.y + self.size)
+            bit_position = pos.x * self.size + pos.y
             mask |= 1 << bit_position
         return mask
 
-board_size = 1
+board_size = 3
 board = Board(board_size)
 board.generate_positions()
 
