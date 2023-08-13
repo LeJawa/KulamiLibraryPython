@@ -10,8 +10,7 @@
 #  - If a tile can be placed, place it and remove the position from the list
 #  - If a tile cannot be placed, try the next tile
 
-from math import cos
-from random import shuffle, uniform, choice
+from random import shuffle, uniform
 import random
 from bitmasking import check_collision
 from constants import BOARD_SIZE
