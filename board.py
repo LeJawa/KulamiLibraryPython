@@ -81,7 +81,7 @@ class Board:
         tile_mask = tile.get_bit_mask(self.available_size)
         return (board_mask | tile_mask) - tile_mask != board_mask
     
-    def max_board_size_reached(self, tile: Tile) -> bool:
+    def placing_tile_exceeds_max_size(self, tile: Tile) -> bool:
         min_x = self.available_size
         max_x = 0
         min_y = self.available_size
@@ -110,7 +110,7 @@ class Board:
         if (self.tile_collides_with_board(tile)):
             return False
         
-        if (self.max_board_size_reached(tile)):
+        if (self.placing_tile_exceeds_max_size(tile)):
             return False    
 
         return True
