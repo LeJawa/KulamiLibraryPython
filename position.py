@@ -33,6 +33,9 @@ class Pos:
     def __add__(self, other: 'Pos'):
         return Pos(self.x + other.x, self.y + other.y)
     
+    def __sub__(self, other: 'Pos'):
+        return Pos(self.x - other.x, self.y - other.y)
+    
     def distance_from(self, other: 'Pos') -> float:
         return sqrt((self.x - other.x)**2 + (self.y - other.y)**2).real
     
