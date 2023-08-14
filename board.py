@@ -122,11 +122,11 @@ class Board:
             
         return False
     
-    def initialize_occupied_positions(self) -> None:
+    def initialize_list_of_sockets(self) -> None:
         self.list_of_sockets.clear()
         for tile in self.tiles:
-            for pos in tile.sockets:
-                self.list_of_sockets.append(pos)
+            for socket in tile.sockets:
+                self.list_of_sockets.append(socket)
     
     def place_all_qtiles(self, bag_of_qtiles: list[QuantumTile]) -> bool:
         positions = self.get_sorted_positions()
@@ -139,7 +139,7 @@ class Board:
                     break
             
             if (len(bag_of_qtiles) == 0):
-                self.initialize_occupied_positions()
+                self.initialize_list_of_sockets()
                 return True
         
         return False        
