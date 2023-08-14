@@ -14,7 +14,9 @@ seed()
 
 
 class Board:
-    """Represents the board of the game."""
+    """
+    Represents the board of the game.
+    """
 
     def __init__(self, size: int) -> None:
         self.available_size: int = size
@@ -26,7 +28,9 @@ class Board:
         self.list_of_sockets: list[Socket] = []
 
     def get_sorted_positions(self) -> list[Position]:
-        """Get a list of positions sorted by their distance from the center."""
+        """
+        Get a list of positions sorted by their distance from the center.
+        """
         sorted_positions = []
         for x in range(self.available_size):
             for y in range(self.available_size):
@@ -41,7 +45,9 @@ class Board:
         return str(drawer)
 
     def draw(self) -> None:
-        """Draw the board on the terminal."""
+        """
+        Draw the board on the terminal.
+        """
         print(self)
 
     def get_socket_at(self, x: int, y: int) -> Socket:
@@ -72,7 +78,9 @@ class Board:
         return -1  # No tile at position
 
     def get_board_bit_mask(self) -> int:
-        """Get the bitmask of the board."""
+        """
+        Get the bitmask of the board.
+        """
         mask = 0
 
         for tile in self.tiles:
@@ -85,7 +93,9 @@ class Board:
         return mask
 
     def calculate_weight(self, position: Position) -> float:
-        """Calculate the weight of a position."""
+        """
+        Calculate the weight of a position.
+        """
         random_pos_delta = Position(
             uniform(-1, 1) * RANDOM_MULTIPLIER, uniform(-1, 1) * RANDOM_MULTIPLIER
         )
@@ -94,13 +104,17 @@ class Board:
         return jittered_position.distance_from(self.center)
 
     def tile_collides_with_board(self, tile: Tile) -> bool:
-        """Check if the tile collides with the board."""
+        """
+        Check if the tile collides with the board.
+        """
         board_mask = self.get_board_bit_mask()
         tile_mask = tile.get_bit_mask(self.available_size)
         return (board_mask | tile_mask) - tile_mask != board_mask
 
     def placing_tile_exceeds_max_size(self, tile: Tile) -> bool:
-        """Check if placing the tile exceeds the max board size."""
+        """
+        Check if placing the tile exceeds the max board size.
+        """
         min_x = self.available_size
         max_x = 0
         min_y = self.available_size
@@ -178,20 +192,35 @@ class Board:
 
         return False
 
+    @staticmethod
+    def get_standard_bag_of_qtiles() -> list[QuantumTile]:
+        """
+        Get a standard bag of quantum tiles.
+        The bag contains 4 of each 2x1, 3x1, 3x2 tiles and 5 2x2 tiles.
+        """
+        bag_of_qtiles = []
+
+        for _ in range(4):
+            bag_of_qtiles.append(QuantumTileMaker.get2x1())
+            bag_of_qtiles.append(QuantumTileMaker.get2x2())
+            bag_of_qtiles.append(QuantumTileMaker.get3x1())
+            bag_of_qtiles.append(QuantumTileMaker.get3x2())
+        bag_of_qtiles.append(QuantumTileMaker.get2x2())
+
+        return bag_of_qtiles
+
+    def initialize_standard_board(self) -> None:
+        """
+        Initialize the board with a standard bag of quantum tiles.
+        """
+        bag_of_qtiles = Board.get_standard_bag_of_qtiles()
+
+        self.place_all_qtiles(bag_of_qtiles)
+
 
 if __name__ == "__main__":
     board = Board(BOARD_AVAILABLE_SIZE)
-
-    bag_of_qtiles = []
-
-    for _ in range(4):
-        bag_of_qtiles.append(QuantumTileMaker.get2x1())
-        bag_of_qtiles.append(QuantumTileMaker.get2x2())
-        bag_of_qtiles.append(QuantumTileMaker.get3x1())
-        bag_of_qtiles.append(QuantumTileMaker.get3x2())
-    bag_of_qtiles.append(QuantumTileMaker.get2x2())
-
-    board.place_all_qtiles(bag_of_qtiles)
+    board.initialize_standard_board()
 
     board.list_of_sockets[4].state = State.PLAYER1
     board.list_of_sockets[10].state = State.PLAYER2
