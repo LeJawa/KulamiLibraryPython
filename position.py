@@ -6,6 +6,8 @@ class State:
     EMPTY_TILE = 1
     PLAYER1 = 2
     PLAYER2 = 3
+    PLAYER1_LAST = 4
+    PLAYER2_LAST = 5
 
 
 @dataclass
@@ -13,7 +15,7 @@ class Pos:
     x: int
     y: int
     tile_id: int
-    
+    state: State    
     
     def __init__(self, x: int, y: int):
         self.x = x
@@ -35,15 +37,6 @@ class Pos:
     
     def distance_from(self, other: 'Pos') -> float:
         return sqrt((self.x - other.x)**2 + (self.y - other.y)**2).real
-    
-    def magnitude(self) -> float:
-        return sqrt(self.x**2 + self.y**2)
-    
-    def __lt__(self, other: 'Pos') -> bool:
-        return self.magnitude() < other.magnitude()
-    
-    def __gt__(self, other: 'Pos') -> bool:
-        return self.magnitude() > other.magnitude()
     
     def is_negative(self) -> bool:
         return self.x < 0 or self.y < 0

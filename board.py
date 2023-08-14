@@ -1,15 +1,3 @@
-### Board generation steps
-# Iterate over all position from -n to n in both x and y
-# For each position, calculate the weight of the position
-#  - The weight is the distance from (0,0)
-# Order the positions by weight in ascending order
-# Shuffle the tiles
-# While not all tiles are placed and there are still positions left
-#  - Try to place the next tile in the position with the lowest weight
-#    - Check all possible rotations and translations
-#  - If a tile can be placed, place it and remove the position from the list
-#  - If a tile cannot be placed, try the next tile
-
 from random import shuffle, uniform, seed
 from constants import BOARD_AVAILABLE_SIZE, MAX_BOARD_SIZE
 
@@ -155,11 +143,7 @@ class Board:
                 self.initialize_occupied_positions()
                 return True
         
-        return False
-        
-     
-            
-        
+        return False        
 
 board = Board(BOARD_AVAILABLE_SIZE)
 

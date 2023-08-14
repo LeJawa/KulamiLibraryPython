@@ -2,6 +2,7 @@
 from bash_color import Color, color
 from position import Pos, State
 
+symbols = ["+", "❶", "❷", "①", "②", "⁕", "O", "?"]
 
 class BoardDrawer:
     def __init__(self, board) -> None:
@@ -9,6 +10,7 @@ class BoardDrawer:
         self.size = board.available_size 
         
         self.debug = False
+        self.show_axis = True
     
     def __repr__(self) -> str:
         return self.__str__()
@@ -17,13 +19,17 @@ class BoardDrawer:
     def get_symbol(pos: Pos) -> str:
         state = pos.state
         if (state == State.EMPTY):
-            return " "
+            return color("+", Color.DARKGREY)
         elif (state == State.PLAYER1):
-            return color("⁕", Color.RED)
+            return color("❶", Color.RED)
+        elif (state == State.PLAYER1_LAST):
+            return color("①", Color.RED)
         elif (state == State.PLAYER2):
-            return color("⁕", Color.BLUE)
+            return color("❷", Color.BLUE)
+        elif (state == State.PLAYER2_LAST):
+            return color("②", Color.BLUE)
         elif (state == State.EMPTY_TILE):
-            return "o"
+            return "O"
         else:
             return "?"
     
@@ -35,11 +41,17 @@ class BoardDrawer:
             return str(pos.tile_id)
     
     def __str__(self) -> str:
-        str_board = ""   
+        str_board = ""
+        
+        if (self.show_axis):
+            str_board += "  "
+            for x in range(self.size):
+                str_board += hex(x)[2:] + " "
+            str_board += "\n"
     
         for y in range(self.size):
-            first_line_str = ""
-            second_line_str = ""
+            first_line_str = " "
+            second_line_str = hex(y)[2:]
             for x in range(self.size):
                 upper_left_symbol = self.get_upper_left_symbol(x, y)
                 up_symbol = self.get_up_symbol(x, y)
@@ -61,7 +73,7 @@ class BoardDrawer:
                 
             str_board += first_line_str + second_line_str
         
-        last_line_str = ""
+        last_line_str = " "
         for x in range(self.size):
             upper_left_symbol = self.get_upper_left_symbol(x, y+1)
             up_symbol = self.get_up_symbol(x, y+1)
