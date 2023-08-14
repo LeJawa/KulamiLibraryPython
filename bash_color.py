@@ -1,8 +1,12 @@
+""" Provides ways to colorize strings in the terminal. """
+
 from dataclasses import dataclass
 
 
 @dataclass
 class Color:
+    """ANSI escape sequences for colors."""
+
     PURPLE = "\033[95m"
     CYAN = "\033[96m"
     DARKCYAN = "\033[36m"
@@ -16,5 +20,6 @@ class Color:
     END = "\033[0m"
 
 
-def color(string: str, color: Color):
+def colorize(string: str, color: Color):
+    """Colorize a string."""
     return color + string + Color.END
