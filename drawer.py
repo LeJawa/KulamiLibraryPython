@@ -9,7 +9,7 @@ from bash_color import Color, colorize
 from tile import Socket, State
 
 symbols = ["+", "❶", "❷", "①", "②", "⁕", "O", "?"]
-     
+
 
 class BoardDrawer:
     """Represents the board drawer."""

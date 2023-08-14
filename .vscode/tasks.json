@@ -1,0 +1,27 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    
+    "tasks": [
+        {
+            "label": "Run Board",
+            "type": "shell",
+            "command": "python board.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Lint",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m black *.py ; ${command:python.interpreterPath} -m pylint *.py --rcfile=.pylintrc", 
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        }
+    ]
+}
