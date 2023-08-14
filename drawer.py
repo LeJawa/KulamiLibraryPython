@@ -1,6 +1,6 @@
 # from board import Board
 from bash_color import Color, color
-from position import Pos, State
+from tile import Socket, State
 
 symbols = ["+", "❶", "❷", "①", "②", "⁕", "O", "?"]
 
@@ -16,11 +16,12 @@ class BoardDrawer:
         return self.__str__()
     
     @staticmethod
-    def get_symbol(pos: Pos) -> str:
-        state = pos.state
-        if (state == State.EMPTY):
+    def get_symbol(socket: Socket) -> str:
+        if (socket is None):
             return color("+", Color.DARKGREY)
-        elif (state == State.PLAYER1):
+        
+        state = socket.state
+        if (state == State.PLAYER1):
             return color("❶", Color.RED)
         elif (state == State.PLAYER1_LAST):
             return color("①", Color.RED)
@@ -28,17 +29,17 @@ class BoardDrawer:
             return color("❷", Color.BLUE)
         elif (state == State.PLAYER2_LAST):
             return color("②", Color.BLUE)
-        elif (state == State.EMPTY_TILE):
+        elif (state == State.EMPTY):
             return "O"
         else:
             return "?"
     
     @staticmethod
-    def get_debug_symbol(pos: Pos) -> str:
-        if (pos.state == State.EMPTY):
+    def get_debug_symbol(socket: Socket) -> str:
+        if (socket is None):
             return "•"
-        else:
-            return str(pos.tile_id)
+        
+        return str(socket.tile_id)
     
     def __str__(self) -> str:
         str_board = ""
@@ -50,17 +51,22 @@ class BoardDrawer:
             str_board += "\n"
     
         for y in range(self.size):
-            first_line_str = " "
-            second_line_str = hex(y)[2:]
+            first_line_str = ""
+            second_line_str = ""
+            
+            if (self.show_axis):
+                first_line_str = " "
+                second_line_str = hex(y)[2:]
+            
             for x in range(self.size):
                 upper_left_symbol = self.get_upper_left_symbol(x, y)
                 up_symbol = self.get_up_symbol(x, y)
                 left_symbol = self.get_left_symbol(x, y)
                 
                 if (self.debug):
-                    pos_symbol = BoardDrawer.get_debug_symbol(self.board.get_pos_at(x, y))
+                    pos_symbol = BoardDrawer.get_debug_symbol(self.board.get_socket_at(x, y))
                 else:              
-                    pos_symbol = BoardDrawer.get_symbol(self.board.get_pos_at(x, y))
+                    pos_symbol = BoardDrawer.get_symbol(self.board.get_socket_at(x, y))
                 
                 first_line_str += color(upper_left_symbol + up_symbol, Color.DARKGREY)
                 second_line_str += color(left_symbol, Color.DARKGREY) + pos_symbol
@@ -73,7 +79,10 @@ class BoardDrawer:
                 
             str_board += first_line_str + second_line_str
         
-        last_line_str = " "
+        last_line_str = ""
+        if (self.show_axis):
+            last_line_str = " "
+            
         for x in range(self.size):
             upper_left_symbol = self.get_upper_left_symbol(x, y+1)
             up_symbol = self.get_up_symbol(x, y+1)

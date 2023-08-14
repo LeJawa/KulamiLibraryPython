@@ -5,44 +5,43 @@ random_multiplier = 0.001
 seed()
 
 from drawer import BoardDrawer
-from position import Pos, State
-from tile import QuantumTile, QuantumTileMaker, Tile
-
-
+from position import Position
+from tile import QuantumTile, QuantumTileMaker, Socket, Tile, State
     
 class Board:
     def __init__(self, size: int) -> None: 
         self.available_size: int = size
-        self.center = Pos(size//2, size//2)
+        self.center = Position(size//2, size//2)
         self.max_board_size = MAX_BOARD_SIZE
         
         self.tiles: list[Tile] = []
         
-        self.occupied_positions: list[Pos] = []
+        self.list_of_sockets: list[Socket] = []
 
-    def get_sorted_positions(self) -> list[Pos]:
+    def get_sorted_positions(self) -> list[Position]:
         sorted_positions = []
         for x in range(self.available_size):
             for y in range(self.available_size):
-                sorted_positions.append(Pos(x, y))
+                sorted_positions.append(Position(x, y))
         sorted_positions.sort(key=lambda position: self.calculate_weight(position))
         return sorted_positions
         
     def __str__(self) -> str:
         drawer = BoardDrawer(self)
         drawer.debug = False    
+        drawer.show_axis = True
         return str(drawer)
     
     def draw(self) -> None:
         print(self)
         
-    def get_pos_at(self, x: int, y: int) -> Pos:
+    def get_socket_at(self, x: int, y: int) -> Socket:
         for tile in self.tiles:
-            for pos in tile.positions:
-                if (pos.x == x and pos.y == y):
-                    return pos
+            for socket in tile.sockets:
+                if (socket.position.x == x and socket.position.y == y):
+                    return socket
         
-        return Pos(x, y)
+        return None
     
    
     def get_tile_id_at(self, x: int, y: int) -> int:
@@ -50,8 +49,8 @@ class Board:
             return -1 # Out of bounds    
         
         for tile in self.tiles:
-            for pos in tile.positions:
-                if (pos.x == x and pos.y == y):
+            for socket in tile.sockets:
+                if (socket.position.x == x and socket.position.y == y):
                     return tile.id
         
         return -1 # No tile at position
@@ -60,14 +59,14 @@ class Board:
         mask = 0
         
         for tile in self.tiles:
-            for pos in tile.positions:
+            for socket in tile.sockets:
                 # Set the bit to one at the specified position
-                bit_position = pos.x * self.available_size + pos.y
+                bit_position = socket.position.x * self.available_size + socket.position.y
                 mask |= 1 << bit_position
         return mask
     
-    def calculate_weight(self, position: Pos) -> float:
-        random_pos_delta = Pos(uniform(-1,1)*random_multiplier, uniform(-1,1)*random_multiplier)
+    def calculate_weight(self, position: Position) -> float:
+        random_pos_delta = Position(uniform(-1,1)*random_multiplier, uniform(-1,1)*random_multiplier)
         jittered_position = position + random_pos_delta
         
         return jittered_position.distance_from(self.center)
@@ -83,18 +82,18 @@ class Board:
         min_y = self.available_size
         max_y = 0
         
-        for pos in tile.positions:
-            min_x = min(min_x, pos.x)
-            max_x = max(max_x, pos.x)
-            min_y = min(min_y, pos.y)
-            max_y = max(max_y, pos.y)
+        for socket in tile.sockets:
+            min_x = min(min_x, socket.position.x)
+            max_x = max(max_x, socket.position.x)
+            min_y = min(min_y, socket.position.y)
+            max_y = max(max_y, socket.position.y)
         
         for tile in self.tiles:
-            for pos in tile.positions:
-                min_x = min(min_x, pos.x)
-                max_x = max(max_x, pos.x)
-                min_y = min(min_y, pos.y)
-                max_y = max(max_y, pos.y)
+            for socket in tile.sockets:
+                min_x = min(min_x, socket.position.x)
+                max_x = max(max_x, socket.position.x)
+                min_y = min(min_y, socket.position.y)
+                max_y = max(max_y, socket.position.y)
         
         if (max_x - min_x >= self.max_board_size or max_y - min_y >= self.max_board_size):
             return True
@@ -111,7 +110,7 @@ class Board:
 
         return True
     
-    def place_qtile(self, qtile: QuantumTile, position: Pos) -> bool:
+    def place_qtile(self, qtile: QuantumTile, position: Position) -> bool:
         possible_tiles = qtile.get_possible_tiles_at(position)
         
         shuffle(possible_tiles)
@@ -124,10 +123,10 @@ class Board:
         return False
     
     def initialize_occupied_positions(self) -> None:
-        self.occupied_positions.clear()
+        self.list_of_sockets.clear()
         for tile in self.tiles:
-            for pos in tile.positions:
-                self.occupied_positions.append(pos)
+            for pos in tile.sockets:
+                self.list_of_sockets.append(pos)
     
     def place_all_qtiles(self, bag_of_qtiles: list[QuantumTile]) -> bool:
         positions = self.get_sorted_positions()
@@ -158,7 +157,7 @@ bag_of_qtiles.append(QuantumTileMaker.get2x2())
 
 board.place_all_qtiles(bag_of_qtiles)
 
-board.occupied_positions[4].state = State.PLAYER1
-board.occupied_positions[10].state = State.PLAYER2
+board.list_of_sockets[4].state = State.PLAYER1
+board.list_of_sockets[10].state = State.PLAYER2
 
 board.draw()
