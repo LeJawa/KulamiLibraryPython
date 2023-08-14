@@ -218,11 +218,93 @@ class Board:
         self.place_all_qtiles(bag_of_qtiles)
 
 
-if __name__ == "__main__":
-    board = Board(BOARD_AVAILABLE_SIZE)
-    board.initialize_standard_board()
+class BoardInterface:
+    """
+    Interface for the board.
+    """
 
-    board.list_of_sockets[4].state = State.PLAYER1
-    board.list_of_sockets[10].state = State.PLAYER2
+    def __init__(self, _board: Board) -> None:
+        self.board = _board
+
+    def get_socket_state(self, position: Position) -> State:
+        """
+        Get the state of the socket at the specified position.
+        Returns State.OUT_OF_BOUNDS if the position is out of bounds.
+        """
+        socket = self.board.get_socket_at(position.x, position.y)
+        if socket is None:
+            return State.OUT_OF_BOUNDS
+        return socket.state
+
+    def get_all_sockets(self) -> list[Socket]:
+        """
+        Get all the sockets on the board.
+        """
+        return self.board.list_of_sockets
+
+    def set_socket_state(self, position: Position, state: State) -> bool:
+        """
+        Set the state of the socket at the specified position.
+        Returns False if the position is out of bounds or the socket is not empty.
+        """
+        socket = self.board.get_socket_at(position.x, position.y)
+        if socket is None:
+            return False
+        if socket.state != State.EMPTY:
+            return False
+        socket.state = state
+        return True
+
+    def set_p1_marble(self, position: Position) -> bool:
+        """
+        Changes the PLAYER1_LAST marble to PLAYER1 and
+        sets the state of the socket at the specified position to PLAYER1_LAST.
+        """
+        for socket in self.board.list_of_sockets:
+            if socket.state == State.PLAYER1_LAST:
+                socket.state = State.PLAYER1
+                break
+
+        return self.set_socket_state(position, State.PLAYER1_LAST)
+
+    def set_p2_marble(self, position: Position) -> bool:
+        """
+        Changes the PLAYER2_LAST marble to PLAYER2 and
+        sets the state of the socket at the specified position to PLAYER2_LAST.
+        """
+        for socket in self.board.list_of_sockets:
+            if socket.state == State.PLAYER2_LAST:
+                socket.state = State.PLAYER2
+                break
+
+        return self.set_socket_state(position, State.PLAYER2_LAST)
+
+    def draw(self) -> None:
+        """
+        Draw the board on the terminal.
+        """
+        self.board.draw()
+
+
+# pylint: disable=too-few-public-methods
+class BoardMaker:
+    """
+    Class for creating boards.
+    """
+
+    @staticmethod
+    def get_standard_board() -> BoardInterface:
+        """
+        Get a standard board.
+        """
+        _board = Board(BOARD_AVAILABLE_SIZE)
+        _board.initialize_standard_board()
+
+        iboard = BoardInterface(_board)
+        return iboard
+
+
+if __name__ == "__main__":
+    board = BoardMaker.get_standard_board()
 
     board.draw()

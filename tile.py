@@ -15,6 +15,7 @@ from position import Position
 class State(Enum):
     """Represents the state of a socket."""
 
+    OUT_OF_BOUNDS = 0
     EMPTY = 1
     PLAYER1 = 2
     PLAYER2 = 3
