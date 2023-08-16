@@ -135,10 +135,12 @@ class Kulami:
                 possible_moves.append(socket)
 
         self.possibles_moves = possible_moves
-        
+
         positions = ""
         for socket in self.possibles_moves:
-            positions += "(" + str(socket.position.x) + "," + str(socket.position.y) + ") "
+            positions += (
+                "(" + str(socket.position.x) + "," + str(socket.position.y) + ") "
+            )
         print("Possible moves: " + positions)
 
 
