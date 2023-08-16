@@ -3,21 +3,27 @@
 from enum import Enum
 from board import BoardMaker
 from constants import MARBLES_PER_PLAYER
+from player import HumanPlayer, Player, RandomPlayer
 from tile import Socket, SocketState, TileOwner
 
 
-class Player(Enum):
+class PlayerNumber(Enum):
     """An enum for the players"""
 
     ONE = 1
     TWO = 2
 
 
+# pylint: disable=too-many-instance-attributes
+
+
 class Kulami:
     """The main class for the game"""
 
-    def __init__(self):
+    def __init__(self, player1: Player, player2: Player):
         self.board = BoardMaker.get_standard_board()
+        self.player1 = player1
+        self.player2 = player2
 
         self.turn = 0
         self.max_turns = 2 * MARBLES_PER_PLAYER
@@ -25,68 +31,55 @@ class Kulami:
         self.player1_last_marble: Socket = None
         self.player2_last_marble: Socket = None
 
-        self.possibles_moves: list[Socket] = None
+        self.possible_moves: list[Socket] = None
         self.calculate_possible_moves()
 
-    def get_socket(self) -> Socket:
-        """Gets the socket the player wants to place their marble in"""
-        while True:
-            coords = input("Choose a socket to place your marble: ")
-
-            try:
-                if "," in coords:
-                    coords = coords.split(",")
-                    coords = [int(coord) for coord in coords]
-                elif len(coords) == 2:
-                    coords = [int(coords[0]), int(coords[1])]
-
-                for socket in self.possibles_moves:
-                    if (
-                        socket.position.x == coords[0]
-                        and socket.position.y == coords[1]
-                    ):
-                        return socket
-            except Exception:  # pylint: disable=broad-exception-caught
-                pass
-
-            print("Invalid coordinates")
-
-    def get_current_player(self) -> Player:
+    def get_current_player(self) -> PlayerNumber:
         """Returns the current player"""
         if self.turn % 2 == 0:
-            return Player.ONE
+            return PlayerNumber.ONE
 
-        return Player.TWO
+        return PlayerNumber.TWO
 
     def player_turn(self) -> None:
         """Handles a player's turn"""
         print("Player " + str(self.turn % 2 + 1) + "'s turn")
 
         self.calculate_possible_moves()
+        current_player = self.get_current_player()
 
-        marble_socket = self.get_socket()
+        if current_player == PlayerNumber.ONE:
+            marble_position = self.player1.get_next_move(
+                self.board, self.possible_moves
+            )
+        else:
+            marble_position = self.player2.get_next_move(
+                self.board, self.possible_moves
+            )
 
-        if self.turn % 2 == 0:
-            if self.board.set_p1_marble(marble_socket):
-                self.player1_last_marble = marble_socket
+        if current_player == PlayerNumber.ONE:
+            if self.board.set_p1_marble_at_position(marble_position):
+                self.player1_last_marble = self.board.get_socket_at_position(
+                    marble_position
+                )
             else:
                 print("Invalid move")
                 return
         else:
-            if self.board.set_p2_marble(marble_socket):
-                self.player2_last_marble = marble_socket
+            if self.board.set_p2_marble_at_position(marble_position):
+                self.player2_last_marble = self.board.get_socket_at_position(
+                    marble_position
+                )
             else:
                 print("Invalid move")
                 return
-
-        self.board.draw()
 
         self.turn += 1
 
     def play(self) -> None:
         """Starts the game to be played on the terminal"""
         self.board.draw()
-        while self.turn < self.max_turns and self.possibles_moves != []:
+        while self.turn < self.max_turns and self.possible_moves != []:
             self.player_turn()
 
         print("Game over!")
@@ -101,7 +94,7 @@ class Kulami:
         if (
             self.player1_last_marble is None and self.player2_last_marble is None
         ):  # First turn
-            self.possibles_moves = all_sockets
+            self.possible_moves = all_sockets
             return
 
         possible_moves = []
@@ -131,7 +124,7 @@ class Kulami:
 
             current_player = self.get_current_player()
 
-            if current_player == Player.ONE:
+            if current_player == PlayerNumber.ONE:
                 last_move = self.player2_last_marble.position
             else:
                 last_move = self.player1_last_marble.position
@@ -139,14 +132,7 @@ class Kulami:
             if socket.position.x == last_move.x or socket.position.y == last_move.y:
                 possible_moves.append(socket)
 
-        self.possibles_moves = possible_moves
-
-        positions = ""
-        for socket in self.possibles_moves:
-            positions += (
-                "(" + str(socket.position.x) + "," + str(socket.position.y) + ") "
-            )
-        print("Possible moves: " + positions)
+        self.possible_moves = possible_moves
 
     def get_scores(self) -> tuple[int, int]:
         """Calculates the scores of the players"""
@@ -164,5 +150,5 @@ class Kulami:
 
 
 if __name__ == "__main__":
-    game = Kulami()
+    game = Kulami(HumanPlayer(), RandomPlayer())
     game.play()

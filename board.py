@@ -281,7 +281,7 @@ class BoardInterface:
         socket.state = state
         return True
 
-    def set_p1_marble(self, socket: Socket) -> bool:
+    def set_p1_marble_at_socket(self, socket: Socket) -> bool:
         """
         Changes the PLAYER1_LAST marble to PLAYER1 and
         sets the state of the specified socket to PLAYER1_LAST.
@@ -293,7 +293,7 @@ class BoardInterface:
 
         return self.set_socket_state(socket, SocketState.PLAYER1_LAST)
 
-    def set_p2_marble(self, socket: Socket) -> bool:
+    def set_p2_marble_at_socket(self, socket: Socket) -> bool:
         """
         Changes the PLAYER2_LAST marble to PLAYER2 and
         sets the state of the specified socket to PLAYER2_LAST.
@@ -305,11 +305,34 @@ class BoardInterface:
 
         return self.set_socket_state(socket, SocketState.PLAYER2_LAST)
 
+    def set_p1_marble_at_position(self, position: Position) -> bool:
+        """
+        Changes the PLAYER1_LAST marble to PLAYER1 and
+        sets the state of the specified socket to PLAYER1_LAST.
+        """
+        socket = self.board.get_socket_at(position.x, position.y)
+        return self.set_p1_marble_at_socket(socket)
+
+    def set_p2_marble_at_position(self, position: Position) -> bool:
+        """
+        Changes the PLAYER2_LAST marble to PLAYER2 and
+        sets the state of the specified socket to PLAYER2_LAST.
+        """
+        socket = self.board.get_socket_at(position.x, position.y)
+        return self.set_p2_marble_at_socket(socket)
+
     def draw(self) -> None:
         """
         Draw the board on the terminal.
         """
         self.board.draw()
+
+    def get_socket_at_position(self, position: Position) -> Socket:
+        """
+        Get the socket at the specified position.
+        Returns None if there is no socket at the specified position.
+        """
+        return self.board.get_socket_at(position.x, position.y)
 
 
 # pylint: disable=too-few-public-methods
