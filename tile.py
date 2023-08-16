@@ -61,9 +61,9 @@ class Tile:
         score = 0
 
         for socket in self.sockets:
-            if socket.state == SocketState.PLAYER1 or socket.state == SocketState.PLAYER1_LAST:
+            if socket.state in (SocketState.PLAYER1, SocketState.PLAYER1_LAST):
                 score += 1
-            if socket.state == SocketState.PLAYER2 or socket.state == SocketState.PLAYER2_LAST:
+            if socket.state in (SocketState.PLAYER2, SocketState.PLAYER2_LAST):
                 score -= 1
 
         if score > 0:

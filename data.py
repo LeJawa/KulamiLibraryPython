@@ -1,3 +1,5 @@
+"""Contains dataclasses for the game"""
+
 from dataclasses import dataclass
 from board import BoardInterface
 
@@ -12,4 +14,3 @@ class GameInfo:
     current_player: PlayerNumber
     possible_moves: list[Socket]
     board: BoardInterface
-    

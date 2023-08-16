@@ -13,47 +13,44 @@ from tile import Socket
 class Player:
     """A mother class for players"""
 
-    def get_next_move(
-        self, game_info: GameInfo
-    ) -> Position:
+    def get_next_move(self, game_info: GameInfo) -> Position:
         """Gets the position the player wants to place their marble in"""
         raise NotImplementedError("get_next_move not implemented")
+
 
 class NaivePlayer(Player):
     """A player that chooses the move with the highest immediate score"""
 
-    def get_next_move(
-        self, game_info: GameInfo
-    ) -> Position:
+    def get_next_move(self, game_info: GameInfo) -> Position:
         """Gets the position the player wants to place their marble in"""
-        
+
         best_move = None
         best_score = -1
 
         with VirtualBoard(game_info.board) as virtual_board:
             for socket in game_info.possible_moves:
-                virtual_board.place_marble_at_position(socket.position, game_info.current_player)
+                virtual_board.place_marble_at_position(
+                    socket.position, game_info.current_player
+                )
                 p1_score, p2_score = get_scores(virtual_board.board)
                 virtual_board.revert_last_move()
-                
+
                 if game_info.current_player == PlayerNumber.ONE:
                     score = p1_score - p2_score
                 else:
                     score = p2_score - p1_score
-                    
+
                 if score > best_score:
                     best_score = score
                     best_move = socket.position
-        
+
         return best_move
 
 
 class RandomPlayer(Player):
     """A player that chooses a random move"""
 
-    def get_next_move(
-        self, game_info: GameInfo
-    ) -> Position:
+    def get_next_move(self, game_info: GameInfo) -> Position:
         """Gets the position the player wants to place their marble in"""
 
         return choice(game_info.possible_moves).position
@@ -62,9 +59,7 @@ class RandomPlayer(Player):
 class HumanPlayer(Player):
     """A player that asks the user for a move"""
 
-    def get_next_move(
-        self, game_info: GameInfo
-    ) -> Position:
+    def get_next_move(self, game_info: GameInfo) -> Position:
         """Gets the position the player wants to place their marble in"""
 
         game_info.board.draw()

@@ -1,3 +1,4 @@
+"""This module contains enums for the game."""
 
 from enum import Enum
 
@@ -9,6 +10,7 @@ class TileOwner(Enum):
     PLAYER2 = 2
     NONE = 3
 
+
 class SocketState(Enum):
     """Represents the state of a socket."""
 
@@ -18,6 +20,7 @@ class SocketState(Enum):
     PLAYER2 = 3
     PLAYER1_LAST = 4
     PLAYER2_LAST = 5
+
 
 class PlayerNumber(Enum):
     """An enum for the players"""

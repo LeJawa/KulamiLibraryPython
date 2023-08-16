@@ -336,17 +336,19 @@ class BoardInterface:
         return self.board.get_socket_at(position.x, position.y)
 
 
-class VirtualBoard():
+class VirtualBoard:
     """
     Class for making moves and calculating scores without affecting the actual board.
     """
+
     def __init__(self, interface: BoardInterface) -> None:
         self.board = interface
-        
+
         self.moves_made: list[Position] = []
-    
-    
-    def place_marble_at_position(self, position: Position, player: PlayerNumber) -> bool:
+
+    def place_marble_at_position(
+        self, position: Position, player: PlayerNumber
+    ) -> bool:
         """
         Place a marble at the specified position.
         """
@@ -358,35 +360,33 @@ class VirtualBoard():
             if self.board.set_p2_marble_at_position(position):
                 self.moves_made.append(position)
                 return True
-        
+
         return False
-    
+
     def revert_last_move(self) -> None:
         """
         Revert the last move.
         """
         if len(self.moves_made) == 0:
             return
-        
+
         position = self.moves_made.pop()
         socket = self.board.get_socket_at_position(position)
         socket.state = SocketState.EMPTY
-        
+
     def revert_all_moves(self) -> None:
         """
         Revert all the moves.
         """
         while len(self.moves_made) > 0:
             self.revert_last_move()
-    
+
     def __enter__(self) -> "VirtualBoard":
         return self
-    
+
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.revert_all_moves()
-        
-        
-     
+
 
 # pylint: disable=too-few-public-methods
 class BoardMaker:
@@ -404,7 +404,7 @@ class BoardMaker:
 
         iboard = BoardInterface(_board)
         return iboard
-    
+
     @staticmethod
     def get_very_small_board() -> BoardInterface:
         """
@@ -412,7 +412,7 @@ class BoardMaker:
         """
         _board = Board(8)
         _board.max_board_size = 5
-        
+
         bag_of_qtiles = [QuantumTileMaker.get2x2() for _ in range(4)]
         _board.place_all_qtiles(bag_of_qtiles)
         _board.fit_to_max_board_size()
@@ -420,12 +420,13 @@ class BoardMaker:
         iboard = BoardInterface(_board)
         return iboard
 
-def get_scores(board: BoardInterface) -> tuple[int, int]:
+
+def get_scores(_board: BoardInterface) -> tuple[int, int]:
     """Calculates the scores of the players"""
     player1_score = 0
     player2_score = 0
 
-    for tile in board.get_all_tiles():
+    for tile in _board.get_all_tiles():
         owner = tile.get_owner()
         if owner == TileOwner.PLAYER1:
             player1_score += tile.get_points()
