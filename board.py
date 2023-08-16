@@ -351,6 +351,21 @@ class BoardMaker:
 
         iboard = BoardInterface(_board)
         return iboard
+    
+    @staticmethod
+    def get_very_small_board() -> BoardInterface:
+        """
+        Get a very small board.
+        """
+        _board = Board(8)
+        _board.max_board_size = 5
+        
+        bag_of_qtiles = [QuantumTileMaker.get2x2() for _ in range(4)]
+        _board.place_all_qtiles(bag_of_qtiles)
+        _board.fit_to_max_board_size()
+
+        iboard = BoardInterface(_board)
+        return iboard
 
 
 if __name__ == "__main__":

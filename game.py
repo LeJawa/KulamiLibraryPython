@@ -21,7 +21,6 @@ class Kulami:
     """The main class for the game"""
 
     def __init__(self, player1: Player, player2: Player):
-        self.board = BoardMaker.get_standard_board()
         self.player1 = player1
         self.player2 = player2
 
@@ -32,6 +31,17 @@ class Kulami:
         self.player2_last_marble: Socket = None
 
         self.possible_moves: list[Socket] = None
+        
+    def initialize_standard_board(self) -> None:
+        """Initializes the board with the standard tiles"""
+        self.board = BoardMaker.get_standard_board()
+        
+        self.calculate_possible_moves()
+    
+    def initialize_very_small_board(self) -> None:
+        """Initializes the board with the very small tiles"""
+        self.board = BoardMaker.get_very_small_board()
+        
         self.calculate_possible_moves()
 
     def get_current_player(self) -> PlayerNumber:
@@ -44,8 +54,7 @@ class Kulami:
     def player_turn(self) -> None:
         """Handles a player's turn"""
         print("Player " + str(self.turn % 2 + 1) + "'s turn")
-
-        self.calculate_possible_moves()
+        
         current_player = self.get_current_player()
 
         if current_player == PlayerNumber.ONE:
@@ -74,7 +83,9 @@ class Kulami:
                 print("Invalid move")
                 return
 
-        self.turn += 1
+        self.turn += 1      
+
+        self.calculate_possible_moves()
 
     def play(self) -> None:
         """Starts the game to be played on the terminal"""
@@ -151,4 +162,5 @@ class Kulami:
 
 if __name__ == "__main__":
     game = Kulami(HumanPlayer(), RandomPlayer())
+    game.initialize_very_small_board()
     game.play()
