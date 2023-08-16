@@ -59,7 +59,6 @@ class Tile:
 
     sockets: list[Socket]
     id: int
-    owner: TileOwner = TileOwner.NONE
 
     def get_bit_mask(self, mask_size) -> int:
         """Get the bitmask of the tile."""
@@ -75,6 +74,26 @@ class Tile:
 
     def __repr__(self) -> str:
         return self.__str__()
+    
+    def get_owner(self) -> TileOwner:
+        """Get the owner of the tile."""
+        score = 0
+        
+        for socket in self.sockets:
+            if socket.state == SocketState.PLAYER1:
+                score += 1
+            if socket.state == SocketState.PLAYER2:
+                score -= 1
+        
+        if score > 0:
+            return TileOwner.PLAYER1
+        elif score < 0:
+            return TileOwner.PLAYER2
+        else:
+            return TileOwner.NONE
+    
+    def get_points(self):
+        return len(self.sockets)
 
 
 class QuantumTile:

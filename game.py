@@ -3,7 +3,7 @@
 from enum import Enum
 from board import BoardMaker
 from constants import MARBLES_PER_PLAYER
-from tile import Socket, SocketState
+from tile import Socket, SocketState, TileOwner
 
 
 class Player(Enum):
@@ -86,10 +86,13 @@ class Kulami:
     def play(self) -> None:
         """Starts the game to be played on the terminal"""
         self.board.draw()
-        while self.turn < self.max_turns:
+        while self.turn < self.max_turns and self.possibles_moves != []:
             self.player_turn()
 
         print("Game over!")
+        player1_score, player2_score = self.get_scores()
+        print("Player 1 score: " + str(player1_score))
+        print("Player 2 score: " + str(player2_score))
 
     def calculate_possible_moves(self) -> None:
         """Gets all the possible moves for the current player"""
@@ -144,6 +147,20 @@ class Kulami:
                 "(" + str(socket.position.x) + "," + str(socket.position.y) + ") "
             )
         print("Possible moves: " + positions)
+        
+    def get_scores(self) -> tuple[int, int]:
+        """Calculates the scores of the players"""
+        player1_score = 0
+        player2_score = 0
+        
+        for tile in self.board.get_all_tiles():
+            owner = tile.get_owner()
+            if owner == TileOwner.PLAYER1:
+                player1_score += tile.get_points()
+            elif owner == TileOwner.PLAYER2:
+                player2_score += tile.get_points()
+        
+        return (player1_score, player2_score)
 
 
 if __name__ == "__main__":

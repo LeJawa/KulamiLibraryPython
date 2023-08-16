@@ -262,6 +262,12 @@ class BoardInterface:
         Get all the sockets on the board.
         """
         return self.board.list_of_sockets
+    
+    def get_all_tiles(self) -> list[Tile]:
+        """
+        Get all the tiles on the board.
+        """
+        return self.board.tiles
 
     def set_socket_state(self, socket: Socket, state: SocketState) -> bool:
         """
