@@ -242,12 +242,11 @@ class BoardInterface:
         """
         return self.board.list_of_sockets
 
-    def set_socket_state(self, position: Position, state: State) -> bool:
+    def set_socket_state(self, socket: Socket, state: State) -> bool:
         """
         Set the state of the socket at the specified position.
         Returns False if the position is out of bounds or the socket is not empty.
         """
-        socket = self.board.get_socket_at(position.x, position.y)
         if socket is None:
             return False
         if socket.state != State.EMPTY:
@@ -255,29 +254,29 @@ class BoardInterface:
         socket.state = state
         return True
 
-    def set_p1_marble(self, position: Position) -> bool:
+    def set_p1_marble(self, socket: Socket) -> bool:
         """
         Changes the PLAYER1_LAST marble to PLAYER1 and
-        sets the state of the socket at the specified position to PLAYER1_LAST.
+        sets the state of the specified socket to PLAYER1_LAST.
         """
-        for socket in self.board.list_of_sockets:
-            if socket.state == State.PLAYER1_LAST:
-                socket.state = State.PLAYER1
+        for _socket in self.board.list_of_sockets:
+            if _socket.state == State.PLAYER1_LAST:
+                _socket.state = State.PLAYER1
                 break
 
-        return self.set_socket_state(position, State.PLAYER1_LAST)
+        return self.set_socket_state(socket, State.PLAYER1_LAST)
 
-    def set_p2_marble(self, position: Position) -> bool:
+    def set_p2_marble(self, socket: Socket) -> bool:
         """
         Changes the PLAYER2_LAST marble to PLAYER2 and
-        sets the state of the socket at the specified position to PLAYER2_LAST.
+        sets the state of the specified socket to PLAYER2_LAST.
         """
-        for socket in self.board.list_of_sockets:
-            if socket.state == State.PLAYER2_LAST:
-                socket.state = State.PLAYER2
+        for _socket in self.board.list_of_sockets:
+            if _socket.state == State.PLAYER2_LAST:
+                _socket.state = State.PLAYER2
                 break
 
-        return self.set_socket_state(position, State.PLAYER2_LAST)
+        return self.set_socket_state(socket, State.PLAYER2_LAST)
 
     def draw(self) -> None:
         """

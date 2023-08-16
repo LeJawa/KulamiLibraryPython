@@ -5,9 +5,9 @@
     
     "tasks": [
         {
-            "label": "Run Board",
+            "label": "Run Game",
             "type": "shell",
-            "command": "python board.py",
+            "command": "python game.py",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
