@@ -26,6 +26,27 @@ class Board:
         self.tiles: list[Tile] = []
 
         self.list_of_sockets: list[Socket] = []
+        
+    def fit_to_max_board_size(self) -> None:
+        """
+        Fit the board to the max board size.
+        """
+        min_x = self.available_size
+        max_x = 0
+        min_y = self.available_size
+        max_y = 0
+
+        for socket in self.list_of_sockets:
+            min_x = min(min_x, socket.position.x)
+            min_y = min(min_y, socket.position.y)
+
+        for socket in self.list_of_sockets:
+            socket.position.x -= min_x
+        self.available_size = self.max_board_size
+
+        for socket in self.list_of_sockets:
+            socket.position.y -= min_y
+        self.available_size = self.max_board_size
 
     def get_sorted_positions(self) -> list[Position]:
         """
@@ -216,6 +237,8 @@ class Board:
         bag_of_qtiles = Board.get_standard_bag_of_qtiles()
 
         self.place_all_qtiles(bag_of_qtiles)
+        
+        self.fit_to_max_board_size()
 
 
 class BoardInterface:
