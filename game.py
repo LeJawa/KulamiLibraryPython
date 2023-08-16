@@ -3,7 +3,7 @@
 from enum import Enum
 from board import BoardMaker
 from constants import MARBLES_PER_PLAYER
-from tile import Socket
+from tile import Socket, SocketState
 
 
 class Player(Enum):
@@ -104,10 +104,16 @@ class Kulami:
         possible_moves = []
 
         for socket in all_sockets:
+            if socket.state != SocketState.EMPTY:
+                continue
+
             if (
                 socket.position.x == self.player1_last_marble.position.x
                 and socket.position.y == self.player1_last_marble.position.y
             ):
+                continue
+
+            if socket.tile_id == self.player1_last_marble.tile_id:
                 continue
 
             if self.player2_last_marble is not None:  # To handle the second turn
@@ -117,10 +123,6 @@ class Kulami:
                 ):
                     continue
 
-            if socket.tile_id == self.player1_last_marble.tile_id:
-                continue
-
-            if self.player2_last_marble is not None:  # To handle the second turn
                 if socket.tile_id == self.player2_last_marble.tile_id:
                     continue
 
