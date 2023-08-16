@@ -12,7 +12,7 @@ from random import choice
 from position import Position
 
 
-class State(Enum):
+class SocketState(Enum):
     """Represents the state of a socket."""
 
     OUT_OF_BOUNDS = 0
@@ -29,20 +29,28 @@ class Socket:
 
     position: Position
     tile_id: int
-    state: State
+    state: SocketState
 
     def __init__(self, position: Position):
         self.position = position
-        self.state: State = State.EMPTY
+        self.state: SocketState = SocketState.EMPTY
         self.tile_id = -1
 
     def is_empty(self) -> bool:
         """Check if the socket is empty."""
-        return self.state == State.EMPTY
+        return self.state == SocketState.EMPTY
 
     def set_tile_id(self, _id: int) -> None:
         """Set the tile id the socket belongs to."""
         self.tile_id = _id
+
+
+class TileOwner(Enum):
+    """Represents the owner of a tile."""
+
+    PLAYER1 = 1
+    PLAYER2 = 2
+    NONE = 3
 
 
 @dataclass
@@ -51,6 +59,7 @@ class Tile:
 
     sockets: list[Socket]
     id: int
+    owner: TileOwner = TileOwner.NONE
 
     def get_bit_mask(self, mask_size) -> int:
         """Get the bitmask of the tile."""
@@ -134,7 +143,7 @@ class QuantumTile:
                 possible_socket = Socket(possible_position)
 
                 possible_socket.set_tile_id(_id)
-                possible_socket.state = State.EMPTY
+                possible_socket.state = SocketState.EMPTY
 
                 tile_sockets.append(possible_socket)
             if not out_of_bounds:

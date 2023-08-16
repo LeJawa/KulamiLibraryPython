@@ -7,7 +7,7 @@ from constants import BOARD_AVAILABLE_SIZE, MAX_BOARD_SIZE
 
 from drawer import BoardDrawer
 from position import Position
-from tile import QuantumTile, QuantumTileMaker, Socket, Tile, State
+from tile import QuantumTile, QuantumTileMaker, Socket, Tile, SocketState
 
 RANDOM_MULTIPLIER = 0.001
 seed()
@@ -247,14 +247,14 @@ class BoardInterface:
     def __init__(self, _board: Board) -> None:
         self.board = _board
 
-    def get_socket_state(self, position: Position) -> State:
+    def get_socket_state(self, position: Position) -> SocketState:
         """
         Get the state of the socket at the specified position.
         Returns State.OUT_OF_BOUNDS if the position is out of bounds.
         """
         socket = self.board.get_socket_at(position.x, position.y)
         if socket is None:
-            return State.OUT_OF_BOUNDS
+            return SocketState.OUT_OF_BOUNDS
         return socket.state
 
     def get_all_sockets(self) -> list[Socket]:
@@ -263,14 +263,14 @@ class BoardInterface:
         """
         return self.board.list_of_sockets
 
-    def set_socket_state(self, socket: Socket, state: State) -> bool:
+    def set_socket_state(self, socket: Socket, state: SocketState) -> bool:
         """
         Set the state of the socket at the specified position.
         Returns False if the position is out of bounds or the socket is not empty.
         """
         if socket is None:
             return False
-        if socket.state != State.EMPTY:
+        if socket.state != SocketState.EMPTY:
             return False
         socket.state = state
         return True
@@ -281,11 +281,11 @@ class BoardInterface:
         sets the state of the specified socket to PLAYER1_LAST.
         """
         for _socket in self.board.list_of_sockets:
-            if _socket.state == State.PLAYER1_LAST:
-                _socket.state = State.PLAYER1
+            if _socket.state == SocketState.PLAYER1_LAST:
+                _socket.state = SocketState.PLAYER1
                 break
 
-        return self.set_socket_state(socket, State.PLAYER1_LAST)
+        return self.set_socket_state(socket, SocketState.PLAYER1_LAST)
 
     def set_p2_marble(self, socket: Socket) -> bool:
         """
@@ -293,11 +293,11 @@ class BoardInterface:
         sets the state of the specified socket to PLAYER2_LAST.
         """
         for _socket in self.board.list_of_sockets:
-            if _socket.state == State.PLAYER2_LAST:
-                _socket.state = State.PLAYER2
+            if _socket.state == SocketState.PLAYER2_LAST:
+                _socket.state = SocketState.PLAYER2
                 break
 
-        return self.set_socket_state(socket, State.PLAYER2_LAST)
+        return self.set_socket_state(socket, SocketState.PLAYER2_LAST)
 
     def draw(self) -> None:
         """

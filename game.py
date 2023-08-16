@@ -84,7 +84,7 @@ class Kulami:
         self.turn += 1
 
     def play(self) -> None:
-        """Starts the game"""
+        """Starts the game to be played on the terminal"""
         self.board.draw()
         while self.turn < self.max_turns:
             self.player_turn()

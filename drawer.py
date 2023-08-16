@@ -6,7 +6,7 @@ This file contains the BoardDrawer class, which is used to draw the board.
 
 # from board import Board
 from bash_color import Color, colorize
-from tile import Socket, State
+from tile import Socket, SocketState
 
 symbols = ["+", "❶", "❷", "①", "②", "⁕", "O", "?"]
 
@@ -34,15 +34,15 @@ class BoardDrawer:
             return colorize("+", Color.DARKGREY)
 
         state = socket.state
-        if state == State.PLAYER1:
+        if state == SocketState.PLAYER1:
             symbol = colorize("❶", Color.RED)
-        elif state == State.PLAYER1_LAST:
+        elif state == SocketState.PLAYER1_LAST:
             symbol = colorize("①", Color.RED)
-        elif state == State.PLAYER2:
+        elif state == SocketState.PLAYER2:
             symbol = colorize("❷", Color.BLUE)
-        elif state == State.PLAYER2_LAST:
+        elif state == SocketState.PLAYER2_LAST:
             symbol = colorize("②", Color.BLUE)
-        elif state == State.EMPTY:
+        elif state == SocketState.EMPTY:
             symbol = "O"
 
         return symbol
