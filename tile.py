@@ -74,25 +74,26 @@ class Tile:
 
     def __repr__(self) -> str:
         return self.__str__()
-    
+
     def get_owner(self) -> TileOwner:
         """Get the owner of the tile."""
         score = 0
-        
+
         for socket in self.sockets:
             if socket.state == SocketState.PLAYER1:
                 score += 1
             if socket.state == SocketState.PLAYER2:
                 score -= 1
-        
+
         if score > 0:
             return TileOwner.PLAYER1
-        elif score < 0:
+        if score < 0:
             return TileOwner.PLAYER2
-        else:
-            return TileOwner.NONE
-    
+
+        return TileOwner.NONE
+
     def get_points(self):
+        """Get the points of the tile."""
         return len(self.sockets)
 
 

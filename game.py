@@ -147,19 +147,19 @@ class Kulami:
                 "(" + str(socket.position.x) + "," + str(socket.position.y) + ") "
             )
         print("Possible moves: " + positions)
-        
+
     def get_scores(self) -> tuple[int, int]:
         """Calculates the scores of the players"""
         player1_score = 0
         player2_score = 0
-        
+
         for tile in self.board.get_all_tiles():
             owner = tile.get_owner()
             if owner == TileOwner.PLAYER1:
                 player1_score += tile.get_points()
             elif owner == TileOwner.PLAYER2:
                 player2_score += tile.get_points()
-        
+
         return (player1_score, player2_score)
 
 
