@@ -7,20 +7,9 @@ The QuantumTileMaker class is used to create QuantumTiles of various sizes.
 """
 
 from dataclasses import dataclass
-from enum import Enum
 from random import choice
+from enums import SocketState, TileOwner
 from position import Position
-
-
-class SocketState(Enum):
-    """Represents the state of a socket."""
-
-    OUT_OF_BOUNDS = 0
-    EMPTY = 1
-    PLAYER1 = 2
-    PLAYER2 = 3
-    PLAYER1_LAST = 4
-    PLAYER2_LAST = 5
 
 
 @dataclass
@@ -43,14 +32,6 @@ class Socket:
     def set_tile_id(self, _id: int) -> None:
         """Set the tile id the socket belongs to."""
         self.tile_id = _id
-
-
-class TileOwner(Enum):
-    """Represents the owner of a tile."""
-
-    PLAYER1 = 1
-    PLAYER2 = 2
-    NONE = 3
 
 
 @dataclass
@@ -80,9 +61,9 @@ class Tile:
         score = 0
 
         for socket in self.sockets:
-            if socket.state == SocketState.PLAYER1:
+            if socket.state == SocketState.PLAYER1 or socket.state == SocketState.PLAYER1_LAST:
                 score += 1
-            if socket.state == SocketState.PLAYER2:
+            if socket.state == SocketState.PLAYER2 or socket.state == SocketState.PLAYER2_LAST:
                 score -= 1
 
         if score > 0:

@@ -6,6 +6,7 @@ from random import shuffle, uniform, seed
 from constants import BOARD_AVAILABLE_SIZE, MAX_BOARD_SIZE
 
 from drawer import BoardDrawer
+from enums import PlayerNumber, TileOwner
 from position import Position
 from tile import QuantumTile, QuantumTileMaker, Socket, Tile, SocketState
 
@@ -335,6 +336,58 @@ class BoardInterface:
         return self.board.get_socket_at(position.x, position.y)
 
 
+class VirtualBoard():
+    """
+    Class for making moves and calculating scores without affecting the actual board.
+    """
+    def __init__(self, interface: BoardInterface) -> None:
+        self.board = interface
+        
+        self.moves_made: list[Position] = []
+    
+    
+    def place_marble_at_position(self, position: Position, player: PlayerNumber) -> bool:
+        """
+        Place a marble at the specified position.
+        """
+        if player == PlayerNumber.ONE:
+            if self.board.set_p1_marble_at_position(position):
+                self.moves_made.append(position)
+                return True
+        else:
+            if self.board.set_p2_marble_at_position(position):
+                self.moves_made.append(position)
+                return True
+        
+        return False
+    
+    def revert_last_move(self) -> None:
+        """
+        Revert the last move.
+        """
+        if len(self.moves_made) == 0:
+            return
+        
+        position = self.moves_made.pop()
+        socket = self.board.get_socket_at_position(position)
+        socket.state = SocketState.EMPTY
+        
+    def revert_all_moves(self) -> None:
+        """
+        Revert all the moves.
+        """
+        while len(self.moves_made) > 0:
+            self.revert_last_move()
+    
+    def __enter__(self) -> "VirtualBoard":
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.revert_all_moves()
+        
+        
+     
+
 # pylint: disable=too-few-public-methods
 class BoardMaker:
     """
@@ -366,6 +419,20 @@ class BoardMaker:
 
         iboard = BoardInterface(_board)
         return iboard
+
+def get_scores(board: BoardInterface) -> tuple[int, int]:
+    """Calculates the scores of the players"""
+    player1_score = 0
+    player2_score = 0
+
+    for tile in board.get_all_tiles():
+        owner = tile.get_owner()
+        if owner == TileOwner.PLAYER1:
+            player1_score += tile.get_points()
+        elif owner == TileOwner.PLAYER2:
+            player2_score += tile.get_points()
+
+    return (player1_score, player2_score)
 
 
 if __name__ == "__main__":
