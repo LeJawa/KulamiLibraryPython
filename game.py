@@ -91,6 +91,7 @@ class Kulami:
             print("Turn " + str(self.turn + 1))
             self.board.draw()
             self.player_turn()
+            # input("Press enter to continue...")
 
         self.board.draw()
         print("Game over!")
