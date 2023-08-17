@@ -73,7 +73,7 @@ class MinimaxPlayer(Player):
         with VirtualBoard(game_info.board, game_info.current_player) as vboard:
             for socket in vboard.get_possible_moves():
                 vboard.place_marble_at_position(socket.position)
-                score = self.minimax(vboard, self.depth, maximize)
+                score = self._minimax(vboard, self.depth, maximize)
                 vboard.revert_last_move()
 
                 best_score = (
@@ -85,7 +85,7 @@ class MinimaxPlayer(Player):
 
         return best_move
 
-    def minimax(self, vboard: VirtualBoard, depth: int, maximizing: bool) -> int:
+    def _minimax(self, vboard: VirtualBoard, depth: int, maximizing: bool) -> int:
         """
         Returns the best score for the current player by
         recursively evaluating the board.
@@ -111,7 +111,7 @@ class MinimaxPlayer(Player):
 
             for move in possible_moves:
                 vboard.place_marble_at_position(move.position)
-                best_value = max(best_value, self.minimax(vboard, depth - 1, False))
+                best_value = max(best_value, self._minimax(vboard, depth - 1, False))
                 vboard.revert_last_move()
             return best_value
 
@@ -119,7 +119,7 @@ class MinimaxPlayer(Player):
 
         for move in possible_moves:
             vboard.place_marble_at_position(move.position)
-            best_value = min(best_value, self.minimax(vboard, depth - 1, True))
+            best_value = min(best_value, self._minimax(vboard, depth - 1, True))
             vboard.revert_last_move()
         return best_value
 
