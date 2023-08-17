@@ -14,8 +14,9 @@ RANDOM_MULTIPLIER = 0.001
 
 seed = random.randrange(1e12)
 random.seed(seed)
-with open("seed.txt", "a") as file:
+with open("seed.txt", "a", encoding="utf-8") as file:
     file.write(str(seed) + "\n")
+
 
 class Board:
     """
@@ -120,7 +121,8 @@ class Board:
         Calculate the weight of a position.
         """
         random_pos_delta = Position(
-            random.uniform(-1, 1) * RANDOM_MULTIPLIER, random.uniform(-1, 1) * RANDOM_MULTIPLIER
+            random.uniform(-1, 1) * RANDOM_MULTIPLIER,
+            random.uniform(-1, 1) * RANDOM_MULTIPLIER,
         )
         jittered_position = position + random_pos_delta
 
@@ -338,6 +340,7 @@ class BoardInterface:
         """
         return self.board.get_socket_at(position.x, position.y)
 
+    # pylint: disable=too-many-branches
     def get_possible_moves(self, current_player: PlayerNumber) -> list[Socket]:
         """Gets all the possible moves for the current player"""
 
@@ -389,6 +392,9 @@ class BoardInterface:
                 possible_moves.append(socket)
 
         return possible_moves
+
+
+# pylint: enable=too-many-branches
 
 
 class VirtualBoard:
@@ -453,8 +459,8 @@ class VirtualBoard:
                 last_move = self.player2_last_move
             else:
                 last_move = self.player1_last_move
-        
-        if last_move is not None:   
+
+        if last_move is not None:
             last_socket = self.board.get_socket_at_position(last_move)
             last_socket.state = (
                 SocketState.PLAYER1_LAST

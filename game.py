@@ -3,7 +3,7 @@
 from board import BoardInterface, BoardMaker, get_scores
 from constants import MARBLES_PER_PLAYER
 from data import GameInfo
-from enums import PlayerNumber, SocketState
+from enums import PlayerNumber
 from player import HumanPlayer, MinimaxPlayer, NaivePlayer, Player, RandomPlayer
 from tile import Socket
 
@@ -97,7 +97,6 @@ class Kulami:
         player1_score, player2_score = get_scores(self.board)
         print("Player 1 score: " + str(player1_score))
         print("Player 2 score: " + str(player2_score))
-
 
 
 if __name__ == "__main__":
