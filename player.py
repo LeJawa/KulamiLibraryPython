@@ -53,21 +53,32 @@ class MinimaxPlayer(Player):
 
     def get_next_move(self, game_info: GameInfo) -> Position:
         
+        # If it's the first or second turn, choose a random move
+        # This is to avoid slowing the minimax algorithm too much
+        # when there are many possible moves
         if game_info.turn in (0, 1):
             return choice(game_info.possible_moves).position           
         
+        maximize = game_info.current_player == PlayerNumber.ONE
+        
+        if maximize:
+            best_score = -1000
+        else:
+            best_score = 1000
+        
         best_move = None
-        best_score = 1000
 
         with VirtualBoard(game_info.board, game_info.current_player) as vboard:
             for socket in vboard.get_possible_moves():
                 vboard.place_marble_at_position(socket.position)
-                score = self.minimax(vboard, 3, vboard.current_player == PlayerNumber.ONE)
+                score = self.minimax(vboard, 3, maximize)
                 vboard.revert_last_move()
+                
+                best_score = max(best_score, score) if maximize else min(best_score, score)
 
-                if score < best_score:
-                    best_score = score
+                if best_score == score:
                     best_move = socket.position
+                    
         return best_move
 
     def minimax(self, vboard: VirtualBoard, depth: int, maximizing: bool) -> int:
