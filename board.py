@@ -2,7 +2,7 @@
 This file contains the Board class, which is used to represent the board of the game.
 """
 
-from random import shuffle, uniform, seed
+import random
 from constants import BOARD_AVAILABLE_SIZE, MAX_BOARD_SIZE
 
 from drawer import BoardDrawer
@@ -11,8 +11,11 @@ from position import Position
 from tile import QuantumTile, QuantumTileMaker, Socket, Tile, SocketState
 
 RANDOM_MULTIPLIER = 0.001
-seed()
 
+seed = random.randrange(1e12)
+random.seed(seed)
+with open("seed.txt", "a") as file:
+    file.write(str(seed) + "\n")
 
 class Board:
     """
@@ -117,7 +120,7 @@ class Board:
         Calculate the weight of a position.
         """
         random_pos_delta = Position(
-            uniform(-1, 1) * RANDOM_MULTIPLIER, uniform(-1, 1) * RANDOM_MULTIPLIER
+            random.uniform(-1, 1) * RANDOM_MULTIPLIER, random.uniform(-1, 1) * RANDOM_MULTIPLIER
         )
         jittered_position = position + random_pos_delta
 
@@ -174,7 +177,7 @@ class Board:
         """
         possible_tiles = qtile.get_possible_tiles_at(position)
 
-        shuffle(possible_tiles)
+        random.shuffle(possible_tiles)
 
         for tile in possible_tiles:
             if self.can_place_tile(tile):
@@ -199,7 +202,7 @@ class Board:
         """
         positions = self.get_sorted_positions()
 
-        shuffle(qtiles)
+        random.shuffle(qtiles)
         for position in positions:
             for qtile in qtiles:
                 if self.place_qtile(qtile, position):

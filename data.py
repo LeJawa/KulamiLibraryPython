@@ -14,3 +14,4 @@ class GameInfo:
     current_player: PlayerNumber
     possible_moves: list[Socket]
     board: BoardInterface
+    turn: int

@@ -23,7 +23,7 @@ class NaivePlayer(Player):
 
     def get_next_move(self, game_info: GameInfo) -> Position:
         best_move = None
-        best_score = -1
+        best_score = -1000
 
         with VirtualBoard(game_info.board, game_info.current_player) as vboard:
             for socket in game_info.possible_moves:
@@ -35,6 +35,11 @@ class NaivePlayer(Player):
                     score = p1_score - p2_score
                 else:
                     score = p2_score - p1_score
+                    
+                score = vboard.evaluate()
+                
+                if vboard.current_player == PlayerNumber.TWO:
+                    score *= -1
 
                 if score > best_score:
                     best_score = score
@@ -47,35 +52,52 @@ class MinimaxPlayer(Player):
     """A player that chooses the best move using minimax"""
 
     def get_next_move(self, game_info: GameInfo) -> Position:
+        
+        if game_info.turn in (0, 1):
+            return choice(game_info.possible_moves).position           
+        
         best_move = None
-        best_score = -1
+        best_score = 1000
 
         with VirtualBoard(game_info.board, game_info.current_player) as vboard:
             for socket in vboard.get_possible_moves():
                 vboard.place_marble_at_position(socket.position)
-                score = self.minimax(vboard, 7, vboard.current_player == PlayerNumber.TWO)
+                score = self.minimax(vboard, 3, vboard.current_player == PlayerNumber.ONE)
                 vboard.revert_last_move()
 
-                if score > best_score:
+                if score < best_score:
                     best_score = score
                     best_move = socket.position
         return best_move
 
     def minimax(self, vboard: VirtualBoard, depth: int, maximizing: bool) -> int:
-        pass
+        possible_moves = vboard.get_possible_moves()
+        
+        if len(possible_moves) == 0:
+            eval = vboard.evaluate()
+            
+            if eval > 0:
+                return 1000
+            elif eval < 0:
+                return -1000
+            else:
+                return 0
+        
         if depth == 0:
             return vboard.evaluate()
 
         if maximizing:
-            best_value = -1000
-            for move in vboard.get_possible_moves():
+            best_value = -1000            
+            
+            for move in possible_moves:
                 vboard.place_marble_at_position(move.position)
                 best_value = max(best_value, self.minimax(vboard, depth - 1, False))
                 vboard.revert_last_move()
             return best_value
         else:
             best_value = 1000
-            for move in vboard.get_possible_moves():
+                        
+            for move in possible_moves:
                 vboard.place_marble_at_position(move.position)
                 best_value = min(best_value, self.minimax(vboard, depth - 1, True))
                 vboard.revert_last_move()

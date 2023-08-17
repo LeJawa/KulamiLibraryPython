@@ -54,6 +54,7 @@ class Kulami:
             current_player=current_player,
             possible_moves=self.possible_moves,
             board=self.board,
+            turn=self.turn,
         )
 
         if current_player == PlayerNumber.ONE:
@@ -91,12 +92,12 @@ class Kulami:
             self.board.draw()
             self.player_turn()
 
+        self.board.draw()
         print("Game over!")
         player1_score, player2_score = get_scores(self.board)
         print("Player 1 score: " + str(player1_score))
         print("Player 2 score: " + str(player2_score))
 
-        self.board.draw()
 
 
 if __name__ == "__main__":
