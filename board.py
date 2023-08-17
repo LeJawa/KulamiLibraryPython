@@ -13,7 +13,7 @@ from tile import QuantumTile, QuantumTileMaker, Socket, Tile, SocketState
 RANDOM_MULTIPLIER = 0.001
 
 seed = random.randrange(1e12)
-random.seed(648638754249)
+random.seed(seed)
 with open("seed.txt", "a", encoding="utf-8") as file:
     file.write(str(seed) + "\n")
 

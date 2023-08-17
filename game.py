@@ -59,6 +59,7 @@ class Kulami:
 
         if current_player == PlayerNumber.ONE:
             marble_position = self.player1.get_next_move(game_info)
+
         else:
             marble_position = self.player2.get_next_move(game_info)
 
