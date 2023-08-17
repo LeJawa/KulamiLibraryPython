@@ -334,24 +334,22 @@ class BoardInterface:
         Returns None if there is no socket at the specified position.
         """
         return self.board.get_socket_at(position.x, position.y)
-    
+
     def get_possible_moves(self, current_player: PlayerNumber) -> list[Socket]:
         """Gets all the possible moves for the current player"""
 
         all_sockets = self.get_all_sockets()
-        
+
         player1_last_marble = None
         player2_last_marble = None
-        
+
         for socket in all_sockets:
             if socket.state == SocketState.PLAYER1_LAST:
                 player1_last_marble = socket
             elif socket.state == SocketState.PLAYER2_LAST:
                 player2_last_marble = socket
 
-        if (
-            player1_last_marble is None and player2_last_marble is None
-        ):  # First turn
+        if player1_last_marble is None and player2_last_marble is None:  # First turn
             return all_sockets
 
         possible_moves = []
@@ -395,27 +393,44 @@ class VirtualBoard:
     Class for making moves and calculating scores without affecting the actual board.
     """
 
-    def __init__(self, interface: BoardInterface) -> None:
+    def __init__(self, interface: BoardInterface, current_player: PlayerNumber) -> None:
         self.board = interface
+        self.current_player = current_player
 
         self.moves_made: list[Position] = []
 
-    def place_marble_at_position(
-        self, position: Position, player: PlayerNumber
-    ) -> bool:
+        self.player1_last_move: Position = None
+        self.player2_last_move: Position = None
+        for socket in self.board.get_all_sockets():
+            if socket.state == SocketState.PLAYER2_LAST:
+                self.player2_last_move = socket.position
+            elif socket.state == SocketState.PLAYER1_LAST:
+                self.player1_last_move = socket.position
+
+    def place_marble_at_position(self, position: Position) -> bool:
         """
         Place a marble at the specified position.
         """
-        if player == PlayerNumber.ONE:
+        if self.current_player == PlayerNumber.ONE:
             if self.board.set_p1_marble_at_position(position):
                 self.moves_made.append(position)
+                self.switch_player()
                 return True
         else:
             if self.board.set_p2_marble_at_position(position):
                 self.moves_made.append(position)
+                self.switch_player()
                 return True
 
         return False
+
+    def switch_player(self) -> None:
+        """Switch the current player"""
+        self.current_player = (
+            PlayerNumber.ONE
+            if self.current_player == PlayerNumber.TWO
+            else PlayerNumber.TWO
+        )
 
     def revert_last_move(self) -> None:
         """
@@ -428,6 +443,24 @@ class VirtualBoard:
         socket = self.board.get_socket_at_position(position)
         socket.state = SocketState.EMPTY
 
+        if len(self.moves_made) > 1:
+            last_move = self.moves_made[-2]
+        else:
+            if self.current_player == PlayerNumber.ONE:
+                last_move = self.player2_last_move
+            else:
+                last_move = self.player1_last_move
+        
+        if last_move is not None:   
+            last_socket = self.board.get_socket_at_position(last_move)
+            last_socket.state = (
+                SocketState.PLAYER1_LAST
+                if last_socket.state == SocketState.PLAYER1
+                else SocketState.PLAYER2_LAST
+            )
+
+        self.switch_player()
+
     def revert_all_moves(self) -> None:
         """
         Revert all the moves.
@@ -435,11 +468,26 @@ class VirtualBoard:
         while len(self.moves_made) > 0:
             self.revert_last_move()
 
+    def evaluate(self) -> int:
+        """
+        Evaluate the board.
+        We simply calculate the difference between the scores of the two players.
+
+        Positive evaluation means player 1 is winning.
+        Negative evaluation means player 2 is winning.
+        """
+        p1_score, p2_score = get_scores(self.board)
+        return p1_score - p2_score
+
     def __enter__(self) -> "VirtualBoard":
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.revert_all_moves()
+
+    def get_possible_moves(self) -> list[Socket]:
+        """Get all the possible moves for the current player"""
+        return self.board.get_possible_moves(self.current_player)
 
 
 # pylint: disable=too-few-public-methods

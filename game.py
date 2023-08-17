@@ -4,7 +4,7 @@ from board import BoardInterface, BoardMaker, get_scores
 from constants import MARBLES_PER_PLAYER
 from data import GameInfo
 from enums import PlayerNumber, SocketState
-from player import HumanPlayer, NaivePlayer, Player, RandomPlayer
+from player import HumanPlayer, MinimaxPlayer, NaivePlayer, Player, RandomPlayer
 from tile import Socket
 
 # pylint: disable=too-many-instance-attributes
@@ -80,12 +80,15 @@ class Kulami:
 
         self.turn += 1
 
-        self.possible_moves = self.board.get_possible_moves(PlayerNumber.ONE if current_player == PlayerNumber.TWO else PlayerNumber.TWO)
+        self.possible_moves = self.board.get_possible_moves(
+            PlayerNumber.ONE if current_player == PlayerNumber.TWO else PlayerNumber.TWO
+        )
 
-    
     def play(self) -> None:
         """Starts the game to be played on the terminal"""
         while self.turn < self.max_turns and self.possible_moves:
+            print("Turn " + str(self.turn + 1))
+            self.board.draw()
             self.player_turn()
 
         print("Game over!")
@@ -106,7 +109,7 @@ if __name__ == "__main__":
     random1 = RandomPlayer()
     random2 = RandomPlayer()
 
-    game = Kulami(naive1, random1)
+    game = Kulami(naive1, MinimaxPlayer())
     # game.initialize_very_small_board()
     game.initialize_standard_board()
     game.play()

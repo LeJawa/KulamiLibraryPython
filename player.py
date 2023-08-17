@@ -22,18 +22,14 @@ class NaivePlayer(Player):
     """A player that chooses the move with the highest immediate score"""
 
     def get_next_move(self, game_info: GameInfo) -> Position:
-        """Gets the position the player wants to place their marble in"""
-
         best_move = None
         best_score = -1
 
-        with VirtualBoard(game_info.board) as virtual_board:
+        with VirtualBoard(game_info.board, game_info.current_player) as vboard:
             for socket in game_info.possible_moves:
-                virtual_board.place_marble_at_position(
-                    socket.position, game_info.current_player
-                )
-                p1_score, p2_score = get_scores(virtual_board.board)
-                virtual_board.revert_last_move()
+                vboard.place_marble_at_position(socket.position)
+                p1_score, p2_score = get_scores(vboard.board)
+                vboard.revert_last_move()
 
                 if game_info.current_player == PlayerNumber.ONE:
                     score = p1_score - p2_score
@@ -47,12 +43,49 @@ class NaivePlayer(Player):
         return best_move
 
 
+class MinimaxPlayer(Player):
+    """A player that chooses the best move using minimax"""
+
+    def get_next_move(self, game_info: GameInfo) -> Position:
+        best_move = None
+        best_score = -1
+
+        with VirtualBoard(game_info.board, game_info.current_player) as vboard:
+            for socket in vboard.get_possible_moves():
+                vboard.place_marble_at_position(socket.position)
+                score = self.minimax(vboard, 7, vboard.current_player == PlayerNumber.TWO)
+                vboard.revert_last_move()
+
+                if score > best_score:
+                    best_score = score
+                    best_move = socket.position
+        return best_move
+
+    def minimax(self, vboard: VirtualBoard, depth: int, maximizing: bool) -> int:
+        pass
+        if depth == 0:
+            return vboard.evaluate()
+
+        if maximizing:
+            best_value = -1000
+            for move in vboard.get_possible_moves():
+                vboard.place_marble_at_position(move.position)
+                best_value = max(best_value, self.minimax(vboard, depth - 1, False))
+                vboard.revert_last_move()
+            return best_value
+        else:
+            best_value = 1000
+            for move in vboard.get_possible_moves():
+                vboard.place_marble_at_position(move.position)
+                best_value = min(best_value, self.minimax(vboard, depth - 1, True))
+                vboard.revert_last_move()
+            return best_value
+
+
 class RandomPlayer(Player):
     """A player that chooses a random move"""
 
     def get_next_move(self, game_info: GameInfo) -> Position:
-        """Gets the position the player wants to place their marble in"""
-
         return choice(game_info.possible_moves).position
 
 
@@ -60,8 +93,6 @@ class HumanPlayer(Player):
     """A player that asks the user for a move"""
 
     def get_next_move(self, game_info: GameInfo) -> Position:
-        """Gets the position the player wants to place their marble in"""
-
         game_info.board.draw()
         print("Player " + str(game_info.current_player) + "'s turn")
         print_possible_moves(game_info.possible_moves)
