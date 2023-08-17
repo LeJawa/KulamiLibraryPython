@@ -334,6 +334,60 @@ class BoardInterface:
         Returns None if there is no socket at the specified position.
         """
         return self.board.get_socket_at(position.x, position.y)
+    
+    def get_possible_moves(self, current_player: PlayerNumber) -> list[Socket]:
+        """Gets all the possible moves for the current player"""
+
+        all_sockets = self.get_all_sockets()
+        
+        player1_last_marble = None
+        player2_last_marble = None
+        
+        for socket in all_sockets:
+            if socket.state == SocketState.PLAYER1_LAST:
+                player1_last_marble = socket
+            elif socket.state == SocketState.PLAYER2_LAST:
+                player2_last_marble = socket
+
+        if (
+            player1_last_marble is None and player2_last_marble is None
+        ):  # First turn
+            return all_sockets
+
+        possible_moves = []
+
+        for socket in all_sockets:
+            if socket.state != SocketState.EMPTY:
+                continue
+
+            if (
+                socket.position.x == player1_last_marble.position.x
+                and socket.position.y == player1_last_marble.position.y
+            ):
+                continue
+
+            if socket.tile_id == player1_last_marble.tile_id:
+                continue
+
+            if player2_last_marble is not None:  # To handle the second turn
+                if (
+                    socket.position.x == player2_last_marble.position.x
+                    and socket.position.y == player2_last_marble.position.y
+                ):
+                    continue
+
+                if socket.tile_id == player2_last_marble.tile_id:
+                    continue
+
+            if current_player == PlayerNumber.ONE:
+                last_move = player2_last_marble.position
+            else:
+                last_move = player1_last_marble.position
+
+            if socket.position.x == last_move.x or socket.position.y == last_move.y:
+                possible_moves.append(socket)
+
+        return possible_moves
 
 
 class VirtualBoard:

@@ -31,13 +31,13 @@ class Kulami:
         """Initializes the board with the standard tiles"""
         self.board = BoardMaker.get_standard_board()
 
-        self.calculate_possible_moves()
+        self.possible_moves = self.board.get_possible_moves(PlayerNumber.ONE)
 
     def initialize_very_small_board(self) -> None:
         """Initializes the board with the very small tiles"""
         self.board = BoardMaker.get_very_small_board()
 
-        self.calculate_possible_moves()
+        self.possible_moves = self.board.get_possible_moves(PlayerNumber.ONE)
 
     def get_current_player(self) -> PlayerNumber:
         """Returns the current player"""
@@ -80,56 +80,9 @@ class Kulami:
 
         self.turn += 1
 
-        self.calculate_possible_moves()
+        self.possible_moves = self.board.get_possible_moves(PlayerNumber.ONE if current_player == PlayerNumber.TWO else PlayerNumber.TWO)
 
-    def calculate_possible_moves(self) -> None:
-        """Gets all the possible moves for the current player"""
-
-        all_sockets = self.board.get_all_sockets()
-
-        if (
-            self.player1_last_marble is None and self.player2_last_marble is None
-        ):  # First turn
-            self.possible_moves = all_sockets
-            return
-
-        possible_moves = []
-
-        for socket in all_sockets:
-            if socket.state != SocketState.EMPTY:
-                continue
-
-            if (
-                socket.position.x == self.player1_last_marble.position.x
-                and socket.position.y == self.player1_last_marble.position.y
-            ):
-                continue
-
-            if socket.tile_id == self.player1_last_marble.tile_id:
-                continue
-
-            if self.player2_last_marble is not None:  # To handle the second turn
-                if (
-                    socket.position.x == self.player2_last_marble.position.x
-                    and socket.position.y == self.player2_last_marble.position.y
-                ):
-                    continue
-
-                if socket.tile_id == self.player2_last_marble.tile_id:
-                    continue
-
-            current_player = self.get_current_player()
-
-            if current_player == PlayerNumber.ONE:
-                last_move = self.player2_last_marble.position
-            else:
-                last_move = self.player1_last_marble.position
-
-            if socket.position.x == last_move.x or socket.position.y == last_move.y:
-                possible_moves.append(socket)
-
-        self.possible_moves = possible_moves
-
+    
     def play(self) -> None:
         """Starts the game to be played on the terminal"""
         while self.turn < self.max_turns and self.possible_moves:
