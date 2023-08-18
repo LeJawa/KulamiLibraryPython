@@ -54,30 +54,33 @@ class MinimaxPlayer(Player):
         # This is to avoid slowing the minimax algorithm too much
         # when there are many possible moves
         if game_info.turn in (0, 1):
-            return choice(game_info.possible_moves).position
-
-        maximize = game_info.current_player == PlayerNumber.ONE
-
-        if maximize:
+            return choice(game_info.possible_moves).position       
+        
+        if game_info.current_player == PlayerNumber.ONE:
+            maximizing = True            
             best_score = -1000
         else:
+            maximizing = False
             best_score = 1000
 
         best_move = None
 
         with VirtualBoard(game_info.board, game_info.current_player) as vboard:
-            for socket in vboard.get_possible_moves():
-                vboard.place_marble_at_position(socket.position)
-                score = self._minimax(vboard, self.depth, maximize)
+            for move in game_info.possible_moves:
+                vboard.place_marble_at_position(move.position)
+                score = self._minimax(vboard, self.depth, maximizing)
                 vboard.revert_last_move()
-
-                best_score = (
-                    max(best_score, score) if maximize else min(best_score, score)
-                )
-
-                if best_score == score:
-                    best_move = socket.position
-
+                
+                
+                if maximizing:
+                    if score > best_score:
+                        best_score = score
+                        best_move = move.position
+                else:
+                    if score < best_score:
+                        best_score = score
+                        best_move = move.position
+                
         return best_move
 
     def _minimax(self, vboard: VirtualBoard, depth: int, maximizing: bool) -> int:
@@ -85,38 +88,30 @@ class MinimaxPlayer(Player):
         Returns the best score for the current player by
         recursively evaluating the board.
         """
-
-        possible_moves = vboard.get_possible_moves()
-
-        if len(possible_moves) == 0:
-            evaluation = vboard.evaluate()
-
-            if evaluation > 0:
-                return 1000
-            if evaluation < 0:
-                return -1000
-
-            return 0
-
-        if depth == 0:
+        
+        if depth == 0 or vboard.is_game_over():
             return vboard.evaluate()
-
+        
         if maximizing:
-            best_value = -1000
-
-            for move in possible_moves:
-                vboard.place_marble_at_position(move.position)
-                best_value = max(best_value, self._minimax(vboard, depth - 1, False))
-                vboard.revert_last_move()
-            return best_value
-
-        best_value = 1000
-
-        for move in possible_moves:
+            best_score = -1000
+        else:
+            best_score = 1000
+        
+        for move in vboard.get_possible_moves():
             vboard.place_marble_at_position(move.position)
-            best_value = min(best_value, self._minimax(vboard, depth - 1, True))
+            score = self._minimax(vboard, depth - 1, not maximizing)
             vboard.revert_last_move()
-        return best_value
+            
+            if maximizing:
+                if score > best_score:
+                    best_score = score
+            else:
+                if score < best_score:
+                    best_score = score
+        
+        return best_score
+        
+        
 
 
 class RandomPlayer(Player):
