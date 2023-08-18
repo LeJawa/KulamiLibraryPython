@@ -86,19 +86,27 @@ class Kulami:
             PlayerNumber.ONE if current_player == PlayerNumber.TWO else PlayerNumber.TWO
         )
 
-    def play(self) -> None:
+    def play(self, verbose=False) -> PlayerNumber:
         """Starts the game to be played on the terminal"""
         while self.turn < self.max_turns and self.possible_moves:
-            print("Turn " + str(self.turn + 1))
-            self.board.draw()
+            if verbose:
+                print("Turn " + str(self.turn + 1))
+                self.board.draw()
             self.player_turn()
-            # input("Press enter to continue...")
 
-        self.board.draw()
-        print("Game over!")
         player1_score, player2_score = get_scores(self.board)
-        print("Player 1 score: " + str(player1_score))
-        print("Player 2 score: " + str(player2_score))
+        if verbose:
+            self.board.draw()
+            print("Game over!")
+            print("Player 1 score: " + str(player1_score))
+            print("Player 2 score: " + str(player2_score))
+
+        if player1_score > player2_score:
+            return PlayerNumber.ONE
+        if player2_score > player1_score:
+            return PlayerNumber.TWO
+
+        return None
 
 
 if __name__ == "__main__":
@@ -114,4 +122,4 @@ if __name__ == "__main__":
     game = Kulami(MinimaxPlayer(3), random1)
     # game.initialize_very_small_board()
     game.initialize_standard_board()
-    game.play()
+    game.play(verbose=True)

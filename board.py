@@ -497,7 +497,7 @@ class VirtualBoard:
     def get_possible_moves(self) -> list[Socket]:
         """Get all the possible moves for the current player"""
         return self.board.get_possible_moves(self.current_player)
-    
+
     def is_game_over(self) -> bool:
         """Check if the game is over"""
         return len(self.get_possible_moves()) == 0

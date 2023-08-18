@@ -111,7 +111,9 @@ class QuantumTile:
     def assign_id() -> int:
         """Assign a unique id to the tile."""
         QuantumTile.next_id_index += 1
-        return QuantumTile.possible_ids[QuantumTile.next_id_index]
+        return QuantumTile.possible_ids[
+            QuantumTile.next_id_index % len(QuantumTile.possible_ids)
+        ]
 
     def move_to(self, position: Position) -> None:
         """Move the tile to a specified position."""
