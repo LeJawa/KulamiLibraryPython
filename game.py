@@ -119,7 +119,7 @@ if __name__ == "__main__":
     random1 = RandomPlayer()
     random2 = RandomPlayer()
 
-    game = Kulami(MinimaxPlayer(3), random1)
+    game = Kulami(MinimaxPlayer(3), naive1)
     # game.initialize_very_small_board()
     game.initialize_standard_board()
     game.play(verbose=True)

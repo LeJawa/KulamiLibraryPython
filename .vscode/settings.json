@@ -7,5 +7,6 @@
         }
       },
       "terminal.integrated.defaultProfile.windows": "PowerShell",
+      "python.analysis.typeCheckingMode": "off",
       
 }
