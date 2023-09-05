@@ -41,7 +41,7 @@ class Tile:
     sockets: list[Socket]
     id: int
 
-    def get_bit_mask(self, mask_size) -> int:
+    def get_bit_mask(self, mask_size: int) -> int:
         """Get the bitmask of the tile."""
         mask = 0
         for socket in self.sockets:
@@ -73,7 +73,7 @@ class Tile:
 
         return TileOwner.NONE
 
-    def get_points(self):
+    def get_points(self) -> int:
         """Get the points of the tile."""
         return len(self.sockets)
 
@@ -141,7 +141,7 @@ class QuantumTile:
                 possible_position = pos - raw_position
                 if possible_position.is_negative():
                     out_of_bounds = True
-                    continue
+                    break
 
                 possible_socket = Socket(possible_position)
 
@@ -187,7 +187,8 @@ class QuantumTileMaker:
     def get2x1() -> QuantumTile:
         """Get a 2x1 tile."""
         tile = QuantumTile(
-            [Position(0, 0), Position(1, 0)], [Position(0, 0), Position(0, 1)]
+            [Position(0, 0), Position(1, 0)],
+            [Position(0, 0), Position(0, 1)]
         )
         return tile
 
