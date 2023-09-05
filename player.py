@@ -24,7 +24,7 @@ class Player:
 class NaivePlayer(Player):
     """A player that chooses the move with the highest immediate score"""
 
-    def get_next_move(self, game_info: GameInfo) -> Position:
+    def get_next_move(self, game_info: GameInfo) -> Position | None:
         best_move = None
 
         best_score = -1000
@@ -55,7 +55,7 @@ class MinimaxPlayer(Player):
     def __str__(self) -> str:
         return self.__class__.__name__ + f"({self.depth})"
 
-    def get_next_move(self, game_info: GameInfo) -> Position:
+    def get_next_move(self, game_info: GameInfo) -> Position | None:
         # If it's the first or second turn, choose a random move
         # This is to avoid slowing the minimax algorithm too much
         # when there are many possible moves
@@ -74,7 +74,7 @@ class MinimaxPlayer(Player):
         with VirtualBoard(game_info.board, game_info.current_player) as vboard:
             for move in game_info.possible_moves:
                 vboard.place_marble_at_position(move.position)
-                score = self._minimax(vboard, self.depth, maximizing)
+                score = self._minimax(vboard, self.depth, not maximizing)
                 vboard.revert_last_move()
 
                 if maximizing:
