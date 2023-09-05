@@ -154,3 +154,6 @@ cython_debug/
 
 seed.txt
 results/*
+
+# Auto-generated documentation
+html/KulamiLibraryPython/*
