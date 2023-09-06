@@ -18,4 +18,7 @@ Three types of players have been implemented:
 
 To generate documentation, run the following command in the root directory:
 
-`pdoc --html .`
+`pdoc --html . --template-dir pdoc_darkmode`
+
+Remove `--template-dir` tag for light mode.
+Dark mode template has been copied from [here](https://github.com/amaank404/denver-api/tree/master/pdoc)
